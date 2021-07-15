@@ -14,7 +14,7 @@ import System.IO              (IO)
 import qualified Control.Concurrent.Async as Async
 
 -- | Check whether an asynchronous action has completed yet.
--- If the action has not yet started, it remains unstarted.
+-- This does __not__ start the action.
 poll :: LazyAsync a -> IO (Status a)
 poll = atomically . pollSTM
 

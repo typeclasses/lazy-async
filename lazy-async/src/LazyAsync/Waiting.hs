@@ -17,13 +17,13 @@ waitCatchSTM = pollSTM >=> statusOutcomeSTM
 
 -- | Wait for the action to complete, and return its value.
 -- If the action throws an exception, then the exception is returned.
--- Note that this function does __not__ start the action.
+-- This does __not__ start the action.
 waitCatch :: LazyAsync a -> IO (Outcome a)
 waitCatch = atomically . waitCatchSTM
 
 -- | Wait for the action to complete, and return its value.
 -- If the action throws an exception, then the exception is re-thrown.
--- Note that this function does __not__ start the action.
+-- This does __not__ start the action.
 wait :: LazyAsync a -> IO a
 wait = waitCatch >=> outcomeSuccess
 
