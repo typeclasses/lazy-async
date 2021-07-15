@@ -8,7 +8,7 @@ import Data.Function          (($))
 import LazyAsync.LazyAsync    (LazyAsync (A0, A1, A2))
 import System.IO              (IO)
 
--- | Begin running an asynchronous action, if it has not already begun.
+-- | Starts an asynchronous action, if it has not already been started
 start :: LazyAsync a -> IO ()
 start A0{}     = return ()
 start (A1 s _) = atomically $ writeTVar s True
