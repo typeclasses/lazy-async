@@ -6,6 +6,7 @@ import Control.Concurrent.STM.TVar (TVar)
 import Data.Bool                   (Bool)
 import Data.Functor                (Functor (fmap))
 
+-- | An asynchronous action that does not start right away
 data LazyAsync a =
     A0 a
   | A1 (TVar Bool) (Async a)
