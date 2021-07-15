@@ -17,14 +17,17 @@ waitCatchSTM = pollSTM >=> statusOutcomeSTM
 waitCatch :: LazyAsync a -> IO (Outcome a)
 waitCatch = atomically . waitCatchSTM
 
+wait :: LazyAsync a -> IO a
+wait = waitCatch >=> outcomeSuccess
+
 -- | Begin running an asynchronous action, if it has not already begun.
 -- Then wait for it to complete, and return its value.
 -- If the action threw an exception, then the exception is re-thrown.
 startWait :: LazyAsync a -> IO a
-startWait = startWaitCatch >=> outcomeSuccess
+startWait ao = start ao *> wait ao
 
 -- | Begin running an asynchronous action, if it has not already begun.
 -- Then wait for it to complete, and return its value.
 -- If the action threw an exception, then the exception is returned.
 startWaitCatch :: LazyAsync a -> IO (Outcome a)
-startWaitCatch ao = start ao *> atomically (waitCatchSTM ao)
+startWaitCatch ao = start ao *> waitCatch ao
