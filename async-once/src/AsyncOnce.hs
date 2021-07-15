@@ -38,32 +38,28 @@ data AsyncOnce a =
   | forall x. A2 (AsyncOnce (x -> a)) (AsyncOnce x)
 
 instance Functor AsyncOnce where
-    fmap f = \case
-        A0 x -> A0 (f x)
-        A1 s a -> A1 s (fmap f a)
-        A2 x y -> A2 (fmap (fmap f) x) y
+    f `fmap` A0 x = A0 (f x)
+    f `fmap` A1 s a = A1 s (fmap f a)
+    f `fmap` A2 x y = A2 (fmap (fmap f) x) y
 
 instance Applicative AsyncOnce where
     pure = A0
     (<*>) = A2
 
 withAsyncOnce :: IO a -> (AsyncOnce a -> IO b) -> IO b
-withAsyncOnce action =
-  runContT $
-    do
-      s <- newTVarIO False
-      a <- ContT $ Async.withAsync $ waitForTrueIO s *> action
-      return $ A1 s a
+withAsyncOnce action = runContT $ do
+    s <- newTVarIO False
+    a <- ContT $ Async.withAsync $ waitForTrueIO s *> action
+    return $ A1 s a
 
 waitForTrueIO :: TVar Bool -> IO ()
 waitForTrueIO x = atomically $ readTVar x >>= check
 
 -- | Begin running an asynchronous action, if it has not already begun.
 start :: AsyncOnce a -> IO ()
-start = \case
-    A0{} -> return ()
-    A1 s _ -> atomically $ writeTVar s True
-    A2 x y -> start x *> start y
+start A0{} = return ()
+start (A1 s _) = atomically $ writeTVar s True
+start (A2 x y) = start x *> start y
 
 -- | Begin running an asynchronous action, if it has not already begun.
 -- Then wait for it to complete, and return its value.
@@ -84,7 +80,6 @@ poll = atomically . pollSTM
 
 -- | Same as 'poll', but in 'STM'
 pollSTM :: AsyncOnce a -> STM (Poll a)
-pollSTM = \case
-    A0 x -> return $ pure x
-    A1 _ a -> Async.pollSTM a <&> maybeEitherPoll
-    A2 x y -> getCompose $ Compose (pollSTM x) <*> Compose (pollSTM y)
+pollSTM (A0 x) = return $ pure x
+pollSTM (A1 _ a) = Async.pollSTM a <&> maybeEitherPoll
+pollSTM (A2 x y) = getCompose $ Compose (pollSTM x) <*> Compose (pollSTM y)

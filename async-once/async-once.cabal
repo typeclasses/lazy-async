@@ -7,7 +7,7 @@ library
     default-language: Haskell2010
     ghc-options: -Wall
     hs-source-dirs: src
-    default-extensions: DeriveFunctor ExistentialQuantification LambdaCase NoImplicitPrelude
+    default-extensions: DeriveFunctor ExistentialQuantification NoImplicitPrelude
     exposed-modules: AsyncOnce
     other-modules: AsyncOnce.Conversions AsyncOnce.Done AsyncOnce.Poll
     build-depends: async, base, relude, stm, transformers

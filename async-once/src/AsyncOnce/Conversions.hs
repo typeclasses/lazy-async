@@ -11,13 +11,17 @@ import Data.Maybe (Maybe(..))
 import System.IO (IO)
 
 eitherDone :: Either SomeException a -> Done a
-eitherDone = \case{ Left e -> Failure e; Right x -> Success x }
+eitherDone (Left e) = Failure e
+eitherDone (Right x) = Success x
 
 maybeEitherPoll :: Maybe (Either SomeException a) -> Poll a
-maybeEitherPoll = \case{ Nothing -> Incomplete; Just x -> Done (eitherDone x) }
+maybeEitherPoll Nothing = Incomplete
+maybeEitherPoll (Just x) = Done (eitherDone x)
 
 pollDoneSTM :: Poll a -> STM (Done a)
-pollDoneSTM = \case{ Incomplete -> retry; Done x -> return x }
+pollDoneSTM Incomplete = retry
+pollDoneSTM (Done x) = return x
 
 doneSuccess :: Done a -> IO a
-doneSuccess = \case{ Failure e -> throw e; Success x -> return x }
+doneSuccess (Failure e) = throw e
+doneSuccess (Success x) = return x
