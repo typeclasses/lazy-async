@@ -1,17 +1,17 @@
-module LazyAsync.Done where
+module LazyAsync.Outcome where
 
 import Control.Applicative (Applicative (pure, (<*>)))
 import Control.Exception   (SomeException)
 import Data.Function       (($))
 import Data.Functor        (Functor (fmap))
 
-data Done a = Failure SomeException | Success a
+data Outcome a = Failure SomeException | Success a
 
-instance Functor Done where
+instance Functor Outcome where
     _ `fmap` Failure e = Failure e
     f `fmap` Success x = Success (f x)
 
-instance Applicative Done where
+instance Applicative Outcome where
     pure = Success
 
     Failure e <*> _         = Failure e
