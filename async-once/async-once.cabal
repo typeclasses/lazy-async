@@ -9,5 +9,5 @@ library
     hs-source-dirs: src
     default-extensions: ExistentialQuantification NoImplicitPrelude
     exposed-modules: AsyncOnce
-    other-modules: AsyncOnce.AsyncOnce AsyncOnce.Conversions AsyncOnce.Done AsyncOnce.Poll
+    other-modules: AsyncOnce.AsyncOnce AsyncOnce.Conversions AsyncOnce.Done AsyncOnce.PollType AsyncOnce.Polling
     build-depends: async, base, relude, stm, transformers

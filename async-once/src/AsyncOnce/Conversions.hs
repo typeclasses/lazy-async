@@ -1,7 +1,7 @@
 module AsyncOnce.Conversions where
 
 import AsyncOnce.Done
-import AsyncOnce.Poll
+import AsyncOnce.PollType
 
 import Control.Concurrent.STM (STM, retry)
 import Control.Monad (return)

@@ -1,4 +1,4 @@
-module AsyncOnce.Poll where
+module AsyncOnce.PollType where
 
 import AsyncOnce.Done
 
