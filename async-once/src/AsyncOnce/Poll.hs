@@ -5,7 +5,10 @@ import AsyncOnce.Done
 import Relude
 
 data Poll a = Incomplete | Done (Done a)
-    deriving Functor
+
+instance Functor Poll where
+    _ `fmap` Incomplete = Incomplete
+    f `fmap` Done x = Done (f `fmap` x)
 
 instance Applicative Poll where
     pure = Done . pure
