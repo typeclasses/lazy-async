@@ -1,14 +1,13 @@
 module AsyncOnce.Conversions where
 
-import AsyncOnce.Done
-import AsyncOnce.PollType
-
+import AsyncOnce.Done         (Done (Failure, Success))
+import AsyncOnce.PollType     (Poll (Done, Incomplete))
 import Control.Concurrent.STM (STM, retry)
-import Control.Monad (return)
-import Control.Exception (throw, SomeException)
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..))
-import System.IO (IO)
+import Control.Exception      (SomeException, throw)
+import Control.Monad          (return)
+import Data.Either            (Either (Left, Right))
+import Data.Maybe             (Maybe (Just, Nothing))
+import System.IO              (IO)
 
 eitherDone :: Either SomeException a -> Done a
 eitherDone (Left e) = Failure e

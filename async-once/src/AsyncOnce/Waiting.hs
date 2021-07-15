@@ -1,12 +1,14 @@
 module AsyncOnce.Waiting where
 
-import AsyncOnce.AsyncOnce
-import AsyncOnce.Conversions
-import AsyncOnce.Done
-import AsyncOnce.Polling
-import AsyncOnce.Starting
-
-import Relude
+import AsyncOnce.AsyncOnce    (AsyncOnce)
+import AsyncOnce.Conversions  (doneSuccess, pollDoneSTM)
+import AsyncOnce.Done         (Done)
+import AsyncOnce.Polling      (pollSTM)
+import AsyncOnce.Starting     (start)
+import Control.Applicative    ((*>))
+import Control.Concurrent.STM (atomically)
+import Control.Monad          ((>=>))
+import System.IO              (IO)
 
 -- | Begin running an asynchronous action, if it has not already begun.
 -- Then wait for it to complete, and return its value.

@@ -1,8 +1,9 @@
 module AsyncOnce.PollType where
 
-import AsyncOnce.Done
-
-import Relude
+import AsyncOnce.Done      (Done (Failure, Success))
+import Control.Applicative (Applicative (pure, (<*>)))
+import Data.Function       (($), (.))
+import Data.Functor        (Functor (fmap))
 
 data Poll a = Incomplete | Done (Done a)
 

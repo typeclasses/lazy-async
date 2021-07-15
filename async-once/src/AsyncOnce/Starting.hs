@@ -1,8 +1,12 @@
 module AsyncOnce.Starting where
 
-import AsyncOnce.AsyncOnce
-
-import Relude
+import AsyncOnce.AsyncOnce    (AsyncOnce (A0, A1, A2))
+import Control.Applicative    ((*>))
+import Control.Concurrent.STM (atomically, writeTVar)
+import Control.Monad          (return)
+import Data.Bool              (Bool (True))
+import Data.Function          (($))
+import System.IO              (IO)
 
 -- | Begin running an asynchronous action, if it has not already begun.
 start :: AsyncOnce a -> IO ()

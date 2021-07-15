@@ -1,6 +1,9 @@
 module AsyncOnce.Done where
 
-import Relude
+import Control.Applicative (Applicative (pure, (<*>)))
+import Control.Exception   (SomeException)
+import Data.Function       (($))
+import Data.Functor        (Functor (fmap))
 
 data Done a = Failure SomeException | Success a
 

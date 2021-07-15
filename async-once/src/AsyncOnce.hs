@@ -15,10 +15,10 @@ module AsyncOnce
   , pollSTM
   ) where
 
-import AsyncOnce.AsyncOnce
-import AsyncOnce.Done
-import AsyncOnce.PollType
-import AsyncOnce.Polling
-import AsyncOnce.Spawning
-import AsyncOnce.Starting
-import AsyncOnce.Waiting
+import AsyncOnce.AsyncOnce (AsyncOnce)
+import AsyncOnce.Done      (Done (..))
+import AsyncOnce.PollType  (Poll (..))
+import AsyncOnce.Polling   (poll, pollSTM)
+import AsyncOnce.Spawning  (withAsyncOnce)
+import AsyncOnce.Starting  (start)
+import AsyncOnce.Waiting   (wait, waitCatch)

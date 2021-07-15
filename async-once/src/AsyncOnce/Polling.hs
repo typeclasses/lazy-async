@@ -1,16 +1,15 @@
 module AsyncOnce.Polling where
 
-import AsyncOnce.AsyncOnce
-import AsyncOnce.Conversions
-import AsyncOnce.PollType
-
-import Control.Concurrent.STM ( STM, atomically )
-import Control.Applicative ( (<*>), pure)
-import Control.Monad ( return )
-import Data.Functor ( (<&>) )
-import Data.Functor.Compose ( Compose(Compose, getCompose) )
-import Data.Function ( ($), (.) )
-import System.IO (IO)
+import AsyncOnce.AsyncOnce    (AsyncOnce (A0, A1, A2))
+import AsyncOnce.Conversions  (maybeEitherPoll)
+import AsyncOnce.PollType     (Poll)
+import Control.Applicative    (pure, (<*>))
+import Control.Concurrent.STM (STM, atomically)
+import Control.Monad          (return)
+import Data.Function          (($), (.))
+import Data.Functor           ((<&>))
+import Data.Functor.Compose   (Compose (Compose, getCompose))
+import System.IO              (IO)
 
 import qualified Control.Concurrent.Async as Async
 

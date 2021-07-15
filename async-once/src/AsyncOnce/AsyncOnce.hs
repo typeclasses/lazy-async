@@ -1,7 +1,10 @@
 module AsyncOnce.AsyncOnce where
 
-import Relude
-import Control.Concurrent.Async (Async)
+import Control.Applicative         (Applicative (pure, (<*>)))
+import Control.Concurrent.Async    (Async)
+import Control.Concurrent.STM.TVar (TVar)
+import Data.Bool                   (Bool)
+import Data.Functor                (Functor (fmap))
 
 data AsyncOnce a =
     A0 a
