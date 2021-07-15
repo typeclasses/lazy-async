@@ -15,14 +15,12 @@ module AsyncOnce
   , pollSTM
   ) where
 
+import AsyncOnce.Conversions
 import AsyncOnce.Done
 import AsyncOnce.Poll
 
 -- relude
 import Relude
-
--- base
-import Control.Exception (throw)
 
 -- async
 import qualified Control.Concurrent.Async as Async
@@ -30,7 +28,6 @@ import Control.Concurrent.Async (Async)
 
 -- stm
 import Control.Concurrent.STM (check)
-import qualified Control.Concurrent.STM as STM
 
 -- transformers
 import Control.Monad.Trans.Cont
@@ -91,18 +88,3 @@ pollSTM = \case
     A0 x -> return $ pure x
     A1 AsyncOnce{ aoAsync } -> Async.pollSTM aoAsync <&> maybeEitherPoll
     A2 x y -> getCompose $ Compose (pollSTM x) <*> Compose (pollSTM y)
-
-
----  Boring internal conversions  ---
-
-eitherDone :: Either SomeException a -> Done a
-eitherDone = \case{ Left e -> Failure e; Right x -> Success x }
-
-maybeEitherPoll :: Maybe (Either SomeException a) -> Poll a
-maybeEitherPoll = \case{ Nothing -> Incomplete; Just x -> Done (eitherDone x) }
-
-pollDoneSTM :: Poll a -> STM (Done a)
-pollDoneSTM = \case{ Incomplete -> STM.retry; Done x -> return x }
-
-doneSuccess :: Done a -> IO a
-doneSuccess = \case{ Failure e -> throw e; Success x -> return x }
