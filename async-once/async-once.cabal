@@ -7,6 +7,6 @@ library
     default-language: Haskell2010
     ghc-options: -Wall
     hs-source-dirs: src
-    default-extensions: LambdaCase NamedFieldPuns NoImplicitPrelude
+    default-extensions: DeriveFunctor ExistentialQuantification LambdaCase NamedFieldPuns NoImplicitPrelude
     exposed-modules: AsyncOnce
-    build-depends: async, base, relude, safe-exceptions, stm, transformers
+    build-depends: async, base, relude, stm, transformers
