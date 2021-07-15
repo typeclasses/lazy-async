@@ -12,7 +12,7 @@ data AsyncOnce a =
   | forall x. A2 (AsyncOnce (x -> a)) (AsyncOnce x)
 
 instance Functor AsyncOnce where
-    f `fmap` A0 x = A0 (f x)
+    f `fmap` A0 x   = A0 (f x)
     f `fmap` A1 s a = A1 s (fmap f a)
     f `fmap` A2 x y = A2 (fmap (fmap f) x) y
 

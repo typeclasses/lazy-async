@@ -20,6 +20,6 @@ poll = atomically . pollSTM
 
 -- | Same as 'poll', but in 'STM'
 pollSTM :: AsyncOnce a -> STM (Poll a)
-pollSTM (A0 x) = return $ pure x
+pollSTM (A0 x)   = return $ pure x
 pollSTM (A1 _ a) = Async.pollSTM a <&> maybeEitherPoll
 pollSTM (A2 x y) = getCompose $ Compose (pollSTM x) <*> Compose (pollSTM y)

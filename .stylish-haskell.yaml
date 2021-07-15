@@ -3,9 +3,8 @@
 steps:
 
   - simple_align:
-      cases: false
-      top_level_patterns: false
-      records: false
+      cases: true
+      top_level_patterns: true
 
   - imports:
       align: group
