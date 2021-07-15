@@ -15,6 +15,9 @@ module AsyncOnce
   , pollSTM
   ) where
 
+import AsyncOnce.Done
+import AsyncOnce.Poll
+
 -- relude
 import Relude
 
@@ -37,32 +40,11 @@ data AsyncOnce a = A0 a | A1 (A1 a) | forall x. A2 (AsyncOnce (x -> a)) (AsyncOn
 data A1 a = AsyncOnce{ aoStart :: TVar Bool, aoAsync :: Async a }
     deriving Functor
 
-data Poll a = Incomplete | Done (Done a)
-    deriving Functor
-
-data Done a = Failure SomeException | Success a
-    deriving Functor
-
 instance Functor AsyncOnce where
     fmap f = \case
         A0 x -> A0 (f x)
         A1 x -> A1 (fmap f x)
         A2 x y -> A2 (fmap (fmap f) x) y
-
-instance Applicative Done where
-    pure = Success
-
-    Failure e <*> _         = Failure e
-    _         <*> Failure e = Failure e
-    Success f <*> Success x = Success $ f x
-
-instance Applicative Poll where
-    pure = Done . pure
-
-    Done (Failure e) <*> _                = Done $ Failure e
-    _                <*> Done (Failure e) = Done $ Failure e
-    Done (Success f) <*> Done (Success x) = Done $ Success $ f x
-    _                <*> _                = Incomplete
 
 instance Applicative AsyncOnce where
     pure = A0

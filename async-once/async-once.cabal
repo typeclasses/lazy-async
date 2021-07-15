@@ -9,4 +9,5 @@ library
     hs-source-dirs: src
     default-extensions: DeriveFunctor ExistentialQuantification LambdaCase NamedFieldPuns NoImplicitPrelude
     exposed-modules: AsyncOnce
+    other-modules: AsyncOnce.Done AsyncOnce.Poll
     build-depends: async, base, relude, stm, transformers
