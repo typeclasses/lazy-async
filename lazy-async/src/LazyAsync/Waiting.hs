@@ -3,6 +3,7 @@ module LazyAsync.Waiting where
 import Control.Applicative    ((*>))
 import Control.Concurrent.STM (STM, atomically)
 import Control.Monad          ((>=>))
+import Data.Function          ((.))
 import LazyAsync.Conversions  (outcomeSuccess, statusOutcomeSTM)
 import LazyAsync.LazyAsync    (LazyAsync)
 import LazyAsync.Outcome      (Outcome)
@@ -12,6 +13,9 @@ import System.IO              (IO)
 
 waitCatchSTM :: LazyAsync a -> STM (Outcome a)
 waitCatchSTM = pollSTM >=> statusOutcomeSTM
+
+waitCatch :: LazyAsync a -> IO (Outcome a)
+waitCatch = atomically . waitCatchSTM
 
 -- | Begin running an asynchronous action, if it has not already begun.
 -- Then wait for it to complete, and return its value.
