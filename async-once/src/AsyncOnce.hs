@@ -34,13 +34,13 @@ import Control.Monad.Trans.Cont
 
 data AsyncOnce a =
     A0 a
-  | A1{ aoStart :: TVar Bool, aoAsync :: Async a }
+  | A1 (TVar Bool) (Async a)
   | forall x. A2 (AsyncOnce (x -> a)) (AsyncOnce x)
 
 instance Functor AsyncOnce where
     fmap f = \case
         A0 x -> A0 (f x)
-        A1{ aoStart, aoAsync } -> A1{ aoStart, aoAsync = fmap f aoAsync }
+        A1 s a -> A1 s (fmap f a)
         A2 x y -> A2 (fmap (fmap f) x) y
 
 instance Applicative AsyncOnce where
@@ -51,9 +51,9 @@ withAsyncOnce :: IO a -> (AsyncOnce a -> IO b) -> IO b
 withAsyncOnce action =
   runContT $
     do
-      aoStart <- newTVarIO False
-      aoAsync <- ContT $ Async.withAsync $ waitForTrueIO aoStart *> action
-      return $ A1{ aoStart, aoAsync }
+      s <- newTVarIO False
+      a <- ContT $ Async.withAsync $ waitForTrueIO s *> action
+      return $ A1 s a
 
 waitForTrueIO :: TVar Bool -> IO ()
 waitForTrueIO x = atomically $ readTVar x >>= check
@@ -62,7 +62,7 @@ waitForTrueIO x = atomically $ readTVar x >>= check
 start :: AsyncOnce a -> IO ()
 start = \case
     A0{} -> return ()
-    A1{ aoStart } -> atomically $ writeTVar aoStart True
+    A1 s _ -> atomically $ writeTVar s True
     A2 x y -> start x *> start y
 
 -- | Begin running an asynchronous action, if it has not already begun.
@@ -86,5 +86,5 @@ poll = atomically . pollSTM
 pollSTM :: AsyncOnce a -> STM (Poll a)
 pollSTM = \case
     A0 x -> return $ pure x
-    A1{ aoAsync } -> Async.pollSTM aoAsync <&> maybeEitherPoll
+    A1 _ a -> Async.pollSTM a <&> maybeEitherPoll
     A2 x y -> getCompose $ Compose (pollSTM x) <*> Compose (pollSTM y)
