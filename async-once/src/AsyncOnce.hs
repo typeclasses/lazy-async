@@ -32,15 +32,15 @@ import Control.Concurrent.STM (check)
 -- transformers
 import Control.Monad.Trans.Cont
 
-data AsyncOnce a = A0 a | A1 (A1 a) | forall x. A2 (AsyncOnce (x -> a)) (AsyncOnce x)
-
-data A1 a = AsyncOnce{ aoStart :: TVar Bool, aoAsync :: Async a }
-    deriving Functor
+data AsyncOnce a =
+    A0 a
+  | A1{ aoStart :: TVar Bool, aoAsync :: Async a }
+  | forall x. A2 (AsyncOnce (x -> a)) (AsyncOnce x)
 
 instance Functor AsyncOnce where
     fmap f = \case
         A0 x -> A0 (f x)
-        A1 x -> A1 (fmap f x)
+        A1{ aoStart, aoAsync } -> A1{ aoStart, aoAsync = fmap f aoAsync }
         A2 x y -> A2 (fmap (fmap f) x) y
 
 instance Applicative AsyncOnce where
@@ -53,7 +53,7 @@ withAsyncOnce action =
     do
       aoStart <- newTVarIO False
       aoAsync <- ContT $ Async.withAsync $ waitForTrueIO aoStart *> action
-      return $ A1 $ AsyncOnce{ aoStart, aoAsync }
+      return $ A1{ aoStart, aoAsync }
 
 waitForTrueIO :: TVar Bool -> IO ()
 waitForTrueIO x = atomically $ readTVar x >>= check
@@ -62,7 +62,7 @@ waitForTrueIO x = atomically $ readTVar x >>= check
 start :: AsyncOnce a -> IO ()
 start = \case
     A0{} -> return ()
-    A1 AsyncOnce{ aoStart } -> atomically $ writeTVar aoStart True
+    A1{ aoStart } -> atomically $ writeTVar aoStart True
     A2 x y -> start x *> start y
 
 -- | Begin running an asynchronous action, if it has not already begun.
@@ -86,5 +86,5 @@ poll = atomically . pollSTM
 pollSTM :: AsyncOnce a -> STM (Poll a)
 pollSTM = \case
     A0 x -> return $ pure x
-    A1 AsyncOnce{ aoAsync } -> Async.pollSTM aoAsync <&> maybeEitherPoll
+    A1{ aoAsync } -> Async.pollSTM aoAsync <&> maybeEitherPoll
     A2 x y -> getCompose $ Compose (pollSTM x) <*> Compose (pollSTM y)
