@@ -11,6 +11,7 @@ import LazyAsync.Polling      (pollSTM)
 import LazyAsync.Starting     (start)
 import System.IO              (IO)
 
+-- | Same as 'waitCatch', but in STM
 waitCatchSTM :: LazyAsync a -> STM (Outcome a)
 waitCatchSTM = pollSTM >=> statusOutcomeSTM
 
