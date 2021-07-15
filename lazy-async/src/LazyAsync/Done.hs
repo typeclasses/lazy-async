@@ -1,4 +1,4 @@
-module AsyncOnce.Done where
+module LazyAsync.Done where
 
 import Control.Applicative (Applicative (pure, (<*>)))
 import Control.Exception   (SomeException)

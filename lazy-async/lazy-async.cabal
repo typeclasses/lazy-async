@@ -1,6 +1,6 @@
 cabal-version: 3.0
 
-name: async-once
+name: lazy-async
 version: 0
 
 library
@@ -8,6 +8,6 @@ library
     ghc-options: -Wall
     hs-source-dirs: src
     default-extensions: ExistentialQuantification NoImplicitPrelude
-    exposed-modules: AsyncOnce
-    other-modules: AsyncOnce.AsyncOnce AsyncOnce.Conversions AsyncOnce.Done AsyncOnce.PollType AsyncOnce.Polling AsyncOnce.Spawning AsyncOnce.Starting AsyncOnce.Waiting
+    exposed-modules: LazyAsync
+    other-modules: LazyAsync.LazyAsync LazyAsync.Conversions LazyAsync.Done LazyAsync.PollType LazyAsync.Polling LazyAsync.Spawning LazyAsync.Starting LazyAsync.Waiting
     build-depends: async, base, stm, transformers

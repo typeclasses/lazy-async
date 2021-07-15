@@ -1,9 +1,9 @@
-module AsyncOnce.PollType where
+module LazyAsync.PollType where
 
-import AsyncOnce.Done      (Done (Failure, Success))
 import Control.Applicative (Applicative (pure, (<*>)))
 import Data.Function       (($), (.))
 import Data.Functor        (Functor (fmap))
+import LazyAsync.Done      (Done (Failure, Success))
 
 data Poll a = Incomplete | Done (Done a)
 

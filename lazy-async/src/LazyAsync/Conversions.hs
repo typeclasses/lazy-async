@@ -1,12 +1,12 @@
-module AsyncOnce.Conversions where
+module LazyAsync.Conversions where
 
-import AsyncOnce.Done         (Done (Failure, Success))
-import AsyncOnce.PollType     (Poll (Done, Incomplete))
 import Control.Concurrent.STM (STM, retry)
 import Control.Exception      (SomeException, throw)
 import Control.Monad          (return)
 import Data.Either            (Either (Left, Right))
 import Data.Maybe             (Maybe (Just, Nothing))
+import LazyAsync.Done         (Done (Failure, Success))
+import LazyAsync.PollType     (Poll (Done, Incomplete))
 import System.IO              (IO)
 
 eitherDone :: Either SomeException a -> Done a
