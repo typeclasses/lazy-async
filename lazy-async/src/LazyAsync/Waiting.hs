@@ -13,11 +13,11 @@ import System.IO              (IO)
 -- | Begin running an asynchronous action, if it has not already begun.
 -- Then wait for it to complete, and return its value.
 -- If the action threw an exception, then the exception is re-thrown.
-wait :: LazyAsync a -> IO a
-wait = waitCatch >=> outcomeSuccess
+startWait :: LazyAsync a -> IO a
+startWait = startWaitCatch >=> outcomeSuccess
 
 -- | Begin running an asynchronous action, if it has not already begun.
 -- Then wait for it to complete, and return its value.
 -- If the action threw an exception, then the exception is returned.
-waitCatch :: LazyAsync a -> IO (Outcome a)
-waitCatch ao = start ao *> atomically ((pollSTM >=> statusOutcomeSTM) ao)
+startWaitCatch :: LazyAsync a -> IO (Outcome a)
+startWaitCatch ao = start ao *> atomically ((pollSTM >=> statusOutcomeSTM) ao)
