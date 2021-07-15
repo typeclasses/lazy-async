@@ -20,27 +20,9 @@ import AsyncOnce.Conversions
 import AsyncOnce.Done
 import AsyncOnce.PollType
 import AsyncOnce.Polling
+import AsyncOnce.Spawning
 
--- relude
 import Relude
-
--- async
-import qualified Control.Concurrent.Async as Async
-
--- stm
-import Control.Concurrent.STM (check)
-
--- transformers
-import Control.Monad.Trans.Cont
-
-withAsyncOnce :: IO a -> (AsyncOnce a -> IO b) -> IO b
-withAsyncOnce action = runContT $ do
-    s <- newTVarIO False
-    a <- ContT $ Async.withAsync $ waitForTrueIO s *> action
-    return $ A1 s a
-
-waitForTrueIO :: TVar Bool -> IO ()
-waitForTrueIO x = atomically $ readTVar x >>= check
 
 -- | Begin running an asynchronous action, if it has not already begun.
 start :: AsyncOnce a -> IO ()
