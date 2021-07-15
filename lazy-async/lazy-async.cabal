@@ -9,5 +9,5 @@ library
     hs-source-dirs: src
     default-extensions: ExistentialQuantification NoImplicitPrelude
     exposed-modules: LazyAsync
-    other-modules: LazyAsync.LazyAsync LazyAsync.Conversions LazyAsync.Done LazyAsync.PollType LazyAsync.Polling LazyAsync.Spawning LazyAsync.Starting LazyAsync.Waiting
+    other-modules: LazyAsync.LazyAsync LazyAsync.Conversions LazyAsync.Done LazyAsync.Polling LazyAsync.Spawning LazyAsync.Starting LazyAsync.Status LazyAsync.Waiting
     build-depends: async, base, stm, transformers

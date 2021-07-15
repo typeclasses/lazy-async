@@ -6,20 +6,20 @@ import Control.Monad          (return)
 import Data.Either            (Either (Left, Right))
 import Data.Maybe             (Maybe (Just, Nothing))
 import LazyAsync.Done         (Done (Failure, Success))
-import LazyAsync.PollType     (Poll (Done, Incomplete))
+import LazyAsync.Status       (Status (Done, Incomplete))
 import System.IO              (IO)
 
 eitherDone :: Either SomeException a -> Done a
 eitherDone (Left e)  = Failure e
 eitherDone (Right x) = Success x
 
-maybeEitherPoll :: Maybe (Either SomeException a) -> Poll a
-maybeEitherPoll Nothing  = Incomplete
-maybeEitherPoll (Just x) = Done (eitherDone x)
+maybeEitherStatus :: Maybe (Either SomeException a) -> Status a
+maybeEitherStatus Nothing  = Incomplete
+maybeEitherStatus (Just x) = Done (eitherDone x)
 
-pollDoneSTM :: Poll a -> STM (Done a)
-pollDoneSTM Incomplete = retry
-pollDoneSTM (Done x)   = return x
+statusDoneSTM :: Status a -> STM (Done a)
+statusDoneSTM Incomplete = retry
+statusDoneSTM (Done x)   = return x
 
 doneSuccess :: Done a -> IO a
 doneSuccess (Failure e) = throw e

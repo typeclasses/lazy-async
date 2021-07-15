@@ -1,17 +1,17 @@
-module LazyAsync.PollType where
+module LazyAsync.Status where
 
 import Control.Applicative (Applicative (pure, (<*>)))
 import Data.Function       (($), (.))
 import Data.Functor        (Functor (fmap))
 import LazyAsync.Done      (Done (Failure, Success))
 
-data Poll a = Incomplete | Done (Done a)
+data Status a = Incomplete | Done (Done a)
 
-instance Functor Poll where
+instance Functor Status where
     _ `fmap` Incomplete = Incomplete
     f `fmap` Done x     = Done (f `fmap` x)
 
-instance Applicative Poll where
+instance Applicative Status where
     pure = Done . pure
 
     Done (Failure e) <*> _                = Done $ Failure e

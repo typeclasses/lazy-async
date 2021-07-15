@@ -3,7 +3,7 @@ module LazyAsync.Waiting where
 import Control.Applicative    ((*>))
 import Control.Concurrent.STM (atomically)
 import Control.Monad          ((>=>))
-import LazyAsync.Conversions  (doneSuccess, pollDoneSTM)
+import LazyAsync.Conversions  (doneSuccess, statusDoneSTM)
 import LazyAsync.Done         (Done)
 import LazyAsync.LazyAsync    (LazyAsync)
 import LazyAsync.Polling      (pollSTM)
@@ -20,4 +20,4 @@ wait = waitCatch >=> doneSuccess
 -- Then wait for it to complete, and return its value.
 -- If the action threw an exception, then the exception is returned.
 waitCatch :: LazyAsync a -> IO (Done a)
-waitCatch ao = start ao *> atomically ((pollSTM >=> pollDoneSTM) ao)
+waitCatch ao = start ao *> atomically ((pollSTM >=> statusDoneSTM) ao)
