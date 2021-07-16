@@ -6,28 +6,42 @@ version: 0
 common language
     default-language: Haskell2010
     ghc-options: -Wall
-    default-extensions: ExistentialQuantification FlexibleContexts NoImplicitPrelude
+    default-extensions: ExistentialQuantification
+    default-extensions: FlexibleContexts
+    default-extensions: NoImplicitPrelude
 
 common dependencies
-    build-depends: base, exceptions, lifted-async, monad-control, stm, transformers-base
+    build-depends: base              ^>= 4.14   || ^>= 4.15
+    build-depends: exceptions        ^>= 0.10
+    build-depends: lifted-async      ^>= 0.10
+    build-depends: monad-control     ^>= 1.0.0.4
+    build-depends: stm               ^>= 2.5
+    build-depends: transformers-base ^>= 0.4.5
+
+common test-dependencies
+    import: dependencies
+    build-depends: hedgehog          ^>= 1.0.4
+    build-depends: lazy-async
+    build-depends: o-clock           ^>= 1.2
+    build-depends: optics-core       ^>= 0.3    || ^>= 0.4
+    build-depends: optics-th         ^>= 0.3    || ^>= 0.4
 
 library
     import: language, dependencies
     hs-source-dirs: src
     exposed-modules: LazyAsync
-    other-modules:
-        LazyAsync.LazyAsync
-        LazyAsync.Outcome
-        LazyAsync.Polling
-        LazyAsync.Spawning
-        LazyAsync.Starting
-        LazyAsync.Status
-        LazyAsync.Waiting
+    other-modules: LazyAsync.LazyAsync
+    other-modules: LazyAsync.Outcome
+    other-modules: LazyAsync.Polling
+    other-modules: LazyAsync.Spawning
+    other-modules: LazyAsync.Starting
+    other-modules: LazyAsync.Status
+    other-modules: LazyAsync.Waiting
 
 test-suite test
-    import: language, dependencies
+    import: language, test-dependencies
     hs-source-dirs: test
     type: exitcode-stdio-1.0
     main-is: test.hs
-    default-extensions: OverloadedStrings, TemplateHaskell
-    build-depends: hedgehog, lazy-async, o-clock, optics-core, optics-th
+    default-extensions: OverloadedStrings
+    default-extensions: TemplateHaskell
