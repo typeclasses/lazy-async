@@ -2,7 +2,7 @@ module Main (main) where
 
 import Data.Bool       (not)
 import Data.Eq         (Eq)
-import Data.Function   (($))
+import Data.Function   (($), (.))
 import Data.Maybe      (Maybe (Just))
 import Numeric.Natural (Natural)
 import Prelude         (Integer, ($!), (+))
@@ -36,49 +36,49 @@ group = Group "LazyAsync" properties
 properties :: [(PropertyName, Property)]
 properties =
 
-  [ (,) "'LazyAsync' does not start automatically" $ withTests 1 $ property $
+  [ (,) "'LazyAsync' does not start automatically" $ example $
       expectTicks 0 $ \tick -> LA.withLazyAsync tick $ \la ->
         do
           threadDelay $ sec 1
           LA.poll la >>= statusIncomplete
 
-  , (,) "'start' prompts a 'LazyAsync' to run" $ withTests 1 $ property $
+  , (,) "'start' prompts a 'LazyAsync' to run" $ example $
       expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
         do
           LA.start la
           threadDelay $ sec 1
 
-  , (,) "'startWait' prompts a 'LazyAsync' to run" $ withTests 1 $ property $
+  , (,) "'startWait' prompts a 'LazyAsync' to run" $ example $
       expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
         do
           _ <- LA.startWait la
           return ()
 
-  , (,) "'start' is idempotent" $ withTests 1 $ property $
+  , (,) "'start' is idempotent" $ example $
       expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
         do
           LA.start la
           LA.start la
           threadDelay $ sec 1
 
-  , (,) "'startWait' is idemponent" $ withTests 1 $ property $
+  , (,) "'startWait' is idemponent" $ example $
       expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
         do
           LA.startWait la >>= restoreM >>= (=== 1)
           LA.startWait la >>= restoreM >>= (=== 1)
 
-  , (,) "'startWaitCatch' catches exceptions" $ withTests 1 $ property $
+  , (,) "'startWaitCatch' catches exceptions" $ example $
       LA.withLazyAsync (throw DivideByZero :: PropertyT IO Integer) $ \la ->
           LA.startWaitCatch la >>= outcomeFailure >>= exceptionIs DivideByZero
 
-  , (,) "'startWaitCatch' is idempotent" $ withTests 1 $ property $
+  , (,) "'startWaitCatch' is idempotent" $ example $
       expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
         do
           _ <- LA.startWaitCatch la
           _ <- LA.startWaitCatch la
           return ()
 
-  , (,) "'startWait' on an applicative complex runs both actions" $ withTests 1 $ property $
+  , (,) "'startWait' on an applicative complex runs both actions" $ example $
       expectTicks 2 $ \tick ->
         LA.withLazyAsync tick $ \la1 ->
         LA.withLazyAsync tick $ \la2 ->
@@ -87,6 +87,9 @@ properties =
             return ()
 
   ]
+
+example :: PropertyT IO () -> Property
+example = withTests 1 . property
 
 type Counter = TVar Natural
 
