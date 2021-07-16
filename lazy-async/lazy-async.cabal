@@ -16,7 +16,6 @@ library
     hs-source-dirs: src
     exposed-modules: LazyAsync
     other-modules:
-        LazyAsync.Conversions
         LazyAsync.LazyAsync
         LazyAsync.Outcome
         LazyAsync.Polling

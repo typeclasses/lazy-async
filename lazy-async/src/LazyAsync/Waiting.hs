@@ -1,15 +1,16 @@
 module LazyAsync.Waiting where
 
 import Control.Applicative    ((*>))
-import Control.Concurrent.STM (STM, atomically)
-import Control.Monad          ((>=>))
+import Control.Concurrent.STM (STM, atomically, retry)
+import Control.Monad          (return, (>=>))
+import Control.Monad.Catch    (MonadThrow, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Function          ((.))
-import LazyAsync.Conversions  (outcomeSuccess, statusOutcomeSTM)
 import LazyAsync.LazyAsync    (LazyAsync)
-import LazyAsync.Outcome      (Outcome)
+import LazyAsync.Outcome      (Outcome (Failure, Success))
 import LazyAsync.Polling      (pollSTM)
 import LazyAsync.Starting     (start)
+import LazyAsync.Status       (Status (Done, Incomplete))
 import System.IO              (IO)
 
 -- | Same as 'waitCatch', but in 'STM'
@@ -59,3 +60,11 @@ startWaitCatch = liftIO . startWaitCatchIO
 -- | Specialization of 'startWaitCatch'
 startWaitCatchIO :: LazyAsync a -> IO (Outcome a)
 startWaitCatchIO ao = start ao *> waitCatch ao
+
+statusOutcomeSTM :: Status a -> STM (Outcome a)
+statusOutcomeSTM Incomplete = retry
+statusOutcomeSTM (Done x)   = return x
+
+outcomeSuccess :: MonadThrow m => Outcome a -> m a
+outcomeSuccess (Failure e) = throwM e
+outcomeSuccess (Success x) = return x
