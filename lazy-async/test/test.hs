@@ -1,6 +1,5 @@
 module Main (main) where
 
-import Control.Applicative    ((*>))
 import Control.Concurrent.STM (TVar, atomically, newTVarIO, readTVar,
                                readTVarIO, writeTVar)
 import Control.Monad          (Monad (return, (>>=)), when)
@@ -27,15 +26,21 @@ properties :: [(PropertyName, Property)]
 properties =
 
   [ (,) "'LazyAsync' does not start automatically" $ withTests 1 $ property $
-      expectTicks 0 $ \tick -> LA.withLazyAsync tick $ \_ -> threadDelay $ sec 1
+      expectTicks 0 $ \tick -> LA.withLazyAsync tick $ \_ ->
+          threadDelay $ sec 1
 
   , (,) "'start' prompts a 'LazyAsync' to run" $ withTests 1 $ property $
       expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
-        LA.start la *> threadDelay (sec 1)
+        do
+          LA.start la
+          threadDelay $ sec 1
 
   , (,) "'start' is idempotent" $ withTests 1 $ property $
       expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
-        LA.start la *> LA.start la *> threadDelay (sec 1)
+        do
+          LA.start la
+          LA.start la
+          threadDelay (sec 1)
 
   ]
 
