@@ -1,5 +1,8 @@
 module Main (main) where
 
+import LazyAsync (Outcome, Status, poll, start, startWait, startWaitCatch, wait,
+                  withLazyAsync)
+
 import Data.Bool       (not)
 import Data.Eq         (Eq)
 import Data.Foldable   (traverse_)
@@ -30,10 +33,8 @@ import Optics.AffineFold (An_AffineFold, preview)
 import Optics.Optic      (Is, Optic')
 import Optics.TH         (makePrisms)
 
-import qualified LazyAsync as LA
-
-$(makePrisms ''LA.Status)
-$(makePrisms ''LA.Outcome)
+$(makePrisms ''Status)
+$(makePrisms ''Outcome)
 
 main :: IO ()
 main = checkParallel group >>= \ok -> when (not ok) exitFailure
@@ -45,66 +46,66 @@ properties :: [(PropertyName, Property)]
 properties =
 
   [ (,) "'LazyAsync' does not start automatically" $ example $
-      expectTicks 0 $ \tick -> LA.withLazyAsync tick $ \la ->
+      expectTicks 0 $ \tick -> withLazyAsync tick $ \la ->
         do
           threadDelay $ sec 1
-          LA.poll la >>= focus _Incomplete
+          poll la >>= focus _Incomplete
 
   , (,) "'start' prompts a 'LazyAsync' to run" $ example $
-      expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
+      expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
         do
-          LA.start la
+          start la
           threadDelay $ sec 1
 
   , (,) "'startWait' prompts a 'LazyAsync' to run" $ example $
-      expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
+      expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
         do
-          _ <- LA.startWait la
+          _ <- startWait la
           return ()
 
   , (,) "'start' is idempotent" $ example $
-      expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
+      expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
         do
-          LA.start la
-          LA.start la
+          start la
+          start la
           threadDelay $ sec 1
 
   , (,) "'startWait' is idemponent" $ example $
-      expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
+      expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
         do
-          LA.startWait la >>= restoreM >>= (=== 1)
-          LA.startWait la >>= restoreM >>= (=== 1)
+          startWait la >>= restoreM >>= (=== 1)
+          startWait la >>= restoreM >>= (=== 1)
 
   , (,) "'startWaitCatch' catches exceptions" $ example $
-      LA.withLazyAsync (throw DivideByZero :: PropertyT IO Integer) $ \la ->
-          LA.startWaitCatch la >>= focus _Failure >>= exceptionIs DivideByZero
+      withLazyAsync (throw DivideByZero :: PropertyT IO Integer) $ \la ->
+          startWaitCatch la >>= focus _Failure >>= exceptionIs DivideByZero
 
   , (,) "'startWaitCatch' is idempotent" $ example $
-      expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
+      expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
         do
-          _ <- LA.startWaitCatch la
-          _ <- LA.startWaitCatch la
+          _ <- startWaitCatch la
+          _ <- startWaitCatch la
           return ()
 
   , (,) "'startWait' on an applicative complex runs both actions" $ example $
       expectTicks 2 $ \tick ->
-        LA.withLazyAsync tick $ \la1 ->
-        LA.withLazyAsync tick $ \la2 ->
+        withLazyAsync tick $ \la1 ->
+        withLazyAsync tick $ \la2 ->
           do
-            _ <- LA.startWaitCatch (liftA2 (,) la1 la2)
+            _ <- startWaitCatch (liftA2 (,) la1 la2)
             return ()
 
   , (,) "actions included in more than one applicative context still can only run once" $ example $
       expectTicks 3 $ \tick ->
-        LA.withLazyAsync tick $ \la1 ->
-        LA.withLazyAsync tick $ \la2 ->
-        LA.withLazyAsync tick $ \la3 ->
+        withLazyAsync tick $ \la1 ->
+        withLazyAsync tick $ \la2 ->
+        withLazyAsync tick $ \la3 ->
           do
             let a = liftA2 (,) la1 la2
                 b = liftA2 (,) la3 la2
                 c = liftA2 (,) la1 la3
-            traverse_ LA.start [a, b, c]
-            traverse_ LA.wait [a, b, c]
+            traverse_ start [a, b, c]
+            traverse_ wait [a, b, c]
 
   ]
 
