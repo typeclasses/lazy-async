@@ -3,17 +3,17 @@ module Main (main) where
 import LazyAsync (Outcome, Status, poll, start, startWait, startWaitCatch, wait,
                   withLazyAsync)
 
-import Data.Bool       (not)
-import Data.Eq         (Eq)
-import Data.Foldable   (traverse_)
-import Data.Function   (($), (.))
-import Data.Maybe      (Maybe (Just), maybe)
-import Numeric.Natural (Natural)
-import Prelude         (Integer, ($!), (+))
-import System.Exit     (exitFailure)
-import System.IO       (IO)
-import Text.Show       (Show)
-import Time            (sec, threadDelay)
+import Control.Concurrent (threadDelay)
+import Data.Bool          (not)
+import Data.Eq            (Eq)
+import Data.Foldable      (traverse_)
+import Data.Function      (($), (.))
+import Data.Maybe         (Maybe (Just), maybe)
+import Numeric.Natural    (Natural)
+import Prelude            (Integer, ($!), (+))
+import System.Exit        (exitFailure)
+import System.IO          (IO)
+import Text.Show          (Show)
 
 import Control.Exception (ArithException (DivideByZero),
                           Exception (fromException), SomeException, throw)
@@ -42,20 +42,23 @@ main = checkParallel group >>= \ok -> when (not ok) exitFailure
 group :: Group
 group = Group "LazyAsync" properties
 
+pause :: MonadIO m => m ()
+pause = liftIO $ threadDelay 1000000
+
 properties :: [(PropertyName, Property)]
 properties =
 
   [ (,) "'LazyAsync' does not start automatically" $ example $
       expectTicks 0 $ \tick -> withLazyAsync tick $ \la ->
         do
-          threadDelay $ sec 1
+          pause
           poll la >>= focus _Incomplete
 
   , (,) "'start' prompts a 'LazyAsync' to run" $ example $
       expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
         do
           start la
-          threadDelay $ sec 1
+          pause
 
   , (,) "'startWait' prompts a 'LazyAsync' to run" $ example $
       expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
@@ -68,7 +71,7 @@ properties =
         do
           start la
           start la
-          threadDelay $ sec 1
+          pause
 
   , (,) "'startWait' is idemponent" $ example $
       expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
