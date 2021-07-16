@@ -12,7 +12,7 @@ import LazyAsync.LazyAsync    (LazyAsync (A0, A1, A2))
 import LazyAsync.Status       (Status)
 import System.IO              (IO)
 
-import qualified Control.Concurrent.Async as Async
+import qualified Control.Concurrent.Async.Lifted as Async
 
 -- | Checks whether an asynchronous action has completed yet
 --

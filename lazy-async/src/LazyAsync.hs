@@ -1,12 +1,13 @@
 module LazyAsync
   ( {- * Asynchronous actions -} LazyAsync,
-    {- * Spawning -}             withLazyAsync, withLazyAsyncIO,
-    {- * Getting results -}      startWait, startWaitIO,
-    {- * Catching exceptions -}  startWaitCatch, startWaitCatchIO, Outcome (..),
-    {- * Polling -}              poll, pollIO, Status (..),
-    {- * Starting manually -}    start, startIO, wait, waitIO,
-                                 waitCatch, waitCatchIO,
-    {- * Transactions -}         pollSTM, startSTM, waitCatchSTM
+    {- * Spawning -}             withLazyAsync,
+    {- * Getting results -}      startWait,
+    {- * Catching exceptions -}  startWaitCatch, Outcome (..),
+    {- * Polling -}              poll, Status (..),
+    {- * Starting manually -}    start, wait, waitCatch,
+    {- * Transactions -}         pollSTM, startSTM, waitCatchSTM,
+    {- * IO specializations -}   withLazyAsyncIO, startWaitIO, startWaitCatchIO,
+                                 startIO, pollIO, waitIO, waitCatchIO
   ) where
 
 import LazyAsync.LazyAsync (LazyAsync)

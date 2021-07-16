@@ -6,10 +6,10 @@ version: 0
 common language
     default-language: Haskell2010
     ghc-options: -Wall
-    default-extensions: ExistentialQuantification NoImplicitPrelude
+    default-extensions: ExistentialQuantification FlexibleContexts NoImplicitPrelude
 
 common dependencies
-    build-depends: async, base, exceptions, stm, unliftio-core
+    build-depends: base, exceptions, lifted-async, monad-control, stm, transformers-base
 
 library
     import: language, dependencies
