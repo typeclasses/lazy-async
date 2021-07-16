@@ -13,10 +13,21 @@ instance Functor Status where
     _ `fmap` Incomplete = Incomplete
     f `fmap` Done x     = Done (f `fmap` x)
 
+-- | '<*>' = 'applyStatus'
 instance Applicative Status where
     pure = Done . pure
+    (<*>) = applyStatus
 
-    Done (Failure e) <*> _                = Done $ Failure e
-    _                <*> Done (Failure e) = Done $ Failure e
-    Done (Success f) <*> Done (Success x) = Done $ Success $ f x
-    _                <*> _                = Incomplete
+
+{- | Combines two 'LazyAsync.LazyAsync.LazyAsync' statuses to produce a summary
+of the status of the overall complex.
+
+If any part of a complex is 'Failure', then the complex evaluates to 'Failure',
+even if some parts are 'Incomplete'.
+
+For example, @'applyStatus' 'Incomplete' ('Failure' e)@ = @'Failure' e@. -}
+applyStatus :: Status (a -> b) -> Status a -> Status b
+Done (Failure e) `applyStatus` _                = Done $ Failure e
+_                `applyStatus` Done (Failure e) = Done $ Failure e
+Done (Success f) `applyStatus` Done (Success x) = Done $ Success $ f x
+_                `applyStatus` _                = Incomplete
