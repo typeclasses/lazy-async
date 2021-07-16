@@ -4,8 +4,10 @@ import Control.Applicative (Applicative (pure, (<*>)))
 import Control.Exception   (SomeException)
 import Data.Function       (($))
 import Data.Functor        (Functor (fmap))
+import Text.Show           (Show)
 
 data Outcome a = Failure SomeException | Success a
+    deriving Show
 
 instance Functor Outcome where
     _ `fmap` Failure e = Failure e

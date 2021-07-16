@@ -4,8 +4,10 @@ import Control.Applicative (Applicative (pure, (<*>)))
 import Data.Function       (($), (.))
 import Data.Functor        (Functor (fmap))
 import LazyAsync.Outcome   (Outcome (Failure, Success))
+import Text.Show           (Show)
 
 data Status a = Incomplete | Done (Outcome a)
+    deriving Show
 
 instance Functor Status where
     _ `fmap` Incomplete = Incomplete
