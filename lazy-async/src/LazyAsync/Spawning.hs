@@ -12,9 +12,13 @@ import Data.Function                   (($), (.))
 import LazyAsync.LazyAsync             (LazyAsync (A1))
 import System.IO                       (IO)
 
--- | Create a situation wherein an action shall run asynchronously, if and when it is needed, at most once
---
--- The 'LazyAsync' is only available within the continuation; when the continuation ends, the action is stopped
+{- | Creates a situation wherein:
+
+  * The action shall begin running only once it is needed (that is, until prompted by 'LazyAsync.Starting.start')
+  * The action shall run asynchronously (other than where it is 'LazyAsync.Waiting.wait'ed upon)
+  * The action shall run at most once
+  * The action shall run only within the continuation (when the continuation ends, the action is stopped)
+-}
 withLazyAsync :: MonadBaseControl IO m =>
     m a -- ^ Action
     -> (LazyAsync (StM m a) -> m b) -- ^ Continuation
