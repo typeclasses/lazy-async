@@ -2,7 +2,7 @@ module LazyAsync
   ( {- * Asynchronous actions -}  LazyAsync,
     {- * Spawning -}              withLazyAsync,
     {- * Getting results -}       startWait,
-    {- * Applicative instances -} {- $Applicative -}
+    {- * Combining actions -}     {- $CombiningActions -}
     {- * Catching exceptions -}   startWaitCatch, Outcome (..),
     {- * Polling -}               poll, Status (..),
     {- * Starting manually -}     start, wait, waitCatch,
@@ -21,7 +21,7 @@ import LazyAsync.Waiting   (startWait, startWaitCatch, startWaitCatchIO,
                             startWaitIO, wait, waitCatch, waitCatchIO,
                             waitCatchSTM, waitIO)
 
-{- $Applicative
+{- $CombiningActions
 
 'LazyAsync' has an 'Control.Applicative.Applicative' instance that lets us build
 up complexes that combine results from multiple asynchronous actions.
