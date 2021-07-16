@@ -9,7 +9,7 @@ import Data.Function          ((.))
 import LazyAsync.LazyAsync    (LazyAsync)
 import LazyAsync.Outcome      (Outcome (Failure, Success))
 import LazyAsync.Polling      (pollSTM)
-import LazyAsync.Starting     (start)
+import LazyAsync.Starting     (start, startIO)
 import LazyAsync.Status       (Status (Done, Incomplete))
 import System.IO              (IO)
 
@@ -34,7 +34,7 @@ waitCatchIO = atomically . waitCatchSTM
 -- If the action throws an exception, then the exception is re-thrown
 --
 -- Does __not__ start the action
-wait :: LazyAsync a -> IO a
+wait :: MonadIO m => LazyAsync a -> m a
 wait = liftIO . waitIO
 
 -- | Specialization of 'wait'
@@ -49,7 +49,7 @@ startWait = liftIO . startWaitIO
 
 -- | Specialization of 'startWait'
 startWaitIO :: LazyAsync a -> IO a
-startWaitIO ao = start ao *> wait ao
+startWaitIO ao = startIO ao *> waitIO ao
 
 -- | Starts an asynchronous action, waits for it to complete, and returns its value
 --
