@@ -43,7 +43,7 @@ waitIO = waitCatch >=> outcomeSuccess
 
 -- | Starts an asynchronous action, waits for it to complete, and returns its value
 --
--- If the action throws an exception, then the exception is re-thrown.
+-- If the action throws an exception, then the exception is re-thrown
 startWait :: MonadIO m => LazyAsync a -> m a
 startWait = liftIO . startWaitIO
 

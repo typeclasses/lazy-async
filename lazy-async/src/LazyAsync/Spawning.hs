@@ -12,12 +12,21 @@ import Data.Function                   (($), (.))
 import LazyAsync.LazyAsync             (LazyAsync (A1))
 import System.IO                       (IO)
 
-withLazyAsync :: MonadBaseControl IO m => m a -> (LazyAsync (StM m a) -> m b) -> m b
+-- | Create a situation wherein an action shall run asynchronously, if and when it is needed, at most once
+--
+-- The 'LazyAsync' is only available within the continuation; when the continuation ends, the action is stopped
+withLazyAsync :: MonadBaseControl IO m =>
+    m a -- ^ Action
+    -> (LazyAsync (StM m a) -> m b) -- ^ Continuation
+    -> m b
 withLazyAsync action continue =
     newTVar False >>= \s -> withAsync (waitForTrue s *> action) $ continue . A1 s
 
 -- | Specialization of 'withLazyAsync'
-withLazyAsyncIO :: IO a -> (LazyAsync a -> IO b) -> IO b
+withLazyAsyncIO ::
+    IO a  -- ^ Action
+    -> (LazyAsync a -> IO b) -- ^ Continuation
+    -> IO b
 withLazyAsyncIO = withLazyAsync
 
 waitForTrue :: MonadBase IO m => TVar Bool -> m ()
