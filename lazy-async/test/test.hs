@@ -2,6 +2,7 @@ module Main (main) where
 
 import Data.Bool       (not)
 import Data.Eq         (Eq)
+import Data.Foldable   (traverse_)
 import Data.Function   (($), (.))
 import Data.Maybe      (Maybe (Just))
 import Numeric.Natural (Natural)
@@ -14,7 +15,7 @@ import Time            (sec, threadDelay)
 import Control.Exception (ArithException (DivideByZero),
                           Exception (fromException), SomeException, throw)
 
-import Control.Applicative         ((*>), liftA2)
+import Control.Applicative         (liftA2, (*>))
 import Control.Monad               (Monad (return, (>>=)), when)
 import Control.Monad.IO.Class      (MonadIO (..))
 import Control.Monad.Trans.Control (MonadBaseControl (restoreM))
@@ -85,6 +86,18 @@ properties =
           do
             _ <- LA.startWaitCatch (liftA2 (,) la1 la2)
             return ()
+
+  , (,) "actions included in more than one applicative context still can only run once" $ example $
+      expectTicks 3 $ \tick ->
+        LA.withLazyAsync tick $ \la1 ->
+        LA.withLazyAsync tick $ \la2 ->
+        LA.withLazyAsync tick $ \la3 ->
+          do
+            let a = liftA2 (,) la1 la2
+                b = liftA2 (,) la3 la2
+                c = liftA2 (,) la1 la3
+            traverse_ LA.start [a, b, c]
+            traverse_ LA.wait [a, b, c]
 
   ]
 
