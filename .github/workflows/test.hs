@@ -16,7 +16,7 @@ data GHC = GHC_8_10 | GHC_9_0
 
 constraints ghc = catMaybes
     [ "base"              .= case ghc of GHC_8_10 -> Just "4.14.*"   ; GHC_9_0 -> Just "4.15.*"
-    , "exceptions"        .= case ghc of GHC_8_10 -> Just "0.10.0"   ; GHC_9_0 -> Just "0.10.4"
+    , "exceptions"        .= case ghc of GHC_8_10 -> Just "0.10.4"   ; GHC_9_0 -> Nothing
     , "hedgehog"          .= case ghc of GHC_8_10 -> Just "1.0.4"    ; GHC_9_0 -> Just "1.0.5"
     , "lifted-async"      .= case ghc of GHC_8_10 -> Just "0.10.0.6" ; GHC_9_0 -> Just "0.10.2"
     , "monad-control"     .= case ghc of GHC_8_10 -> Just "1.0.2.3"  ; GHC_9_0 -> Nothing
