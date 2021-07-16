@@ -39,14 +39,6 @@ properties =
 
   ]
 
--- type Log = TVar [String]
-
--- newLog :: MonadIO m => m Log
--- newLog = liftIO $ newTVarIO []
-
--- (<<) :: MonadIO m => Log -> String -> m ()
--- log << str = liftIO $ atomically $ modifyTVar' log (str :)
-
 type Counter = TVar Natural
 
 newCounter :: MonadIO m => m Counter
