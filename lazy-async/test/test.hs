@@ -1,8 +1,8 @@
 module Main (main) where
 
 import Control.Applicative    ((*>))
-import Control.Concurrent.STM (TVar, atomically, modifyTVar', newTVarIO,
-                               readTVarIO)
+import Control.Concurrent.STM (TVar, atomically, newTVarIO, readTVar,
+                               readTVarIO, writeTVar)
 import Control.Monad          (Monad (return, (>>=)), when)
 import Control.Monad.IO.Class (MonadIO (..))
 import Data.Bool              (not)
@@ -10,7 +10,7 @@ import Data.Function          (($))
 import Hedgehog               (Group (Group), MonadTest, Property, PropertyName,
                                checkParallel, property, withTests, (===))
 import Numeric.Natural        (Natural)
-import Prelude                (succ)
+import Prelude                (($!), (+))
 import System.Exit            (exitFailure)
 import System.IO              (IO)
 import Time                   (sec, threadDelay)
@@ -44,13 +44,17 @@ type Counter = TVar Natural
 newCounter :: MonadIO m => m Counter
 newCounter = liftIO $ newTVarIO 0
 
-tickCounter :: MonadIO m => Counter -> m ()
-tickCounter counter = liftIO $ atomically $ modifyTVar' counter succ
+tickCounter :: MonadIO m => Counter -> m Natural
+tickCounter counter = liftIO $ atomically $
+  do
+    x <- readTVar counter
+    writeTVar counter $! x + 1
+    return $ x + 1
 
 assertCount :: (MonadIO m, MonadTest m) => Counter -> Natural -> m ()
 assertCount counter expected = liftIO (readTVarIO counter) >>= (=== expected)
 
-type Tick m = m ()
+type Tick m = m Natural
 
 expectTicks :: (MonadIO m, MonadTest m) =>
     Natural -- ^ Expected number of times the 'Tick' action runs
