@@ -4,7 +4,7 @@ import Data.Bool       (not)
 import Data.Eq         (Eq)
 import Data.Foldable   (traverse_)
 import Data.Function   (($), (.))
-import Data.Maybe      (Maybe (Just))
+import Data.Maybe      (Maybe (Just), maybe)
 import Numeric.Natural (Natural)
 import Prelude         (Integer, ($!), (+))
 import System.Exit     (exitFailure)
@@ -15,7 +15,7 @@ import Time            (sec, threadDelay)
 import Control.Exception (ArithException (DivideByZero),
                           Exception (fromException), SomeException, throw)
 
-import Control.Applicative         (liftA2, (*>))
+import Control.Applicative         (liftA2)
 import Control.Monad               (Monad (return, (>>=)), when)
 import Control.Monad.IO.Class      (MonadIO (..))
 import Control.Monad.Trans.Control (MonadBaseControl (restoreM))
@@ -24,9 +24,16 @@ import Control.Concurrent.STM (TVar, atomically, newTVarIO, readTVar,
                                readTVarIO, writeTVar)
 
 import Hedgehog (Group (Group), MonadTest, Property, PropertyName, PropertyT,
-                 checkParallel, failure, property, success, withTests, (===))
+                 checkParallel, failure, property, withTests, (===))
+
+import Optics.AffineFold (An_AffineFold, preview)
+import Optics.Optic      (Is, Optic')
+import Optics.TH         (makePrisms)
 
 import qualified LazyAsync as LA
+
+$(makePrisms ''LA.Status)
+$(makePrisms ''LA.Outcome)
 
 main :: IO ()
 main = checkParallel group >>= \ok -> when (not ok) exitFailure
@@ -41,7 +48,7 @@ properties =
       expectTicks 0 $ \tick -> LA.withLazyAsync tick $ \la ->
         do
           threadDelay $ sec 1
-          LA.poll la >>= statusIncomplete
+          LA.poll la >>= focus _Incomplete
 
   , (,) "'start' prompts a 'LazyAsync' to run" $ example $
       expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
@@ -70,7 +77,7 @@ properties =
 
   , (,) "'startWaitCatch' catches exceptions" $ example $
       LA.withLazyAsync (throw DivideByZero :: PropertyT IO Integer) $ \la ->
-          LA.startWaitCatch la >>= outcomeFailure >>= exceptionIs DivideByZero
+          LA.startWaitCatch la >>= focus _Failure >>= exceptionIs DivideByZero
 
   , (,) "'startWaitCatch' is idempotent" $ example $
       expectTicks 1 $ \tick -> LA.withLazyAsync tick $ \la ->
@@ -131,21 +138,8 @@ expectTicks n run =
     assertCount counter n
     return x
 
-statusIncomplete :: MonadTest m => LA.Status a -> m ()
-statusIncomplete LA.Incomplete = success
-statusIncomplete _             = failure
-
-statusDone :: MonadTest m => LA.Status a -> m (LA.Outcome a)
-statusDone (LA.Done x) = return x
-statusDone _           = failure
-
-outcomeFailure :: MonadTest m => LA.Outcome a -> m SomeException
-outcomeFailure (LA.Failure x) = return x
-outcomeFailure _              = failure
-
-outcomeSuccess :: MonadTest m => LA.Outcome a -> m a
-outcomeSuccess (LA.Success x) = return x
-outcomeSuccess _              = failure
+focus :: (MonadTest m, Is k An_AffineFold) => Optic' k is s a -> s -> m a
+focus o = maybe failure return . preview o
 
 exceptionIs :: MonadTest m => (Exception e, Eq e, Show e) => e -> SomeException -> m ()
 exceptionIs a b = Just a === fromException b

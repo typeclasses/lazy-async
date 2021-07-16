@@ -29,5 +29,5 @@ test-suite test
     hs-source-dirs: test
     type: exitcode-stdio-1.0
     main-is: test.hs
-    default-extensions: OverloadedStrings
-    build-depends: hedgehog, lazy-async, o-clock
+    default-extensions: OverloadedStrings, TemplateHaskell
+    build-depends: hedgehog, lazy-async, o-clock, optics-core, optics-th
