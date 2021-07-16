@@ -14,7 +14,7 @@ import Time            (sec, threadDelay)
 import Control.Exception (ArithException (DivideByZero),
                           Exception (fromException), SomeException, throw)
 
-import Control.Applicative         ((*>))
+import Control.Applicative         ((*>), liftA2)
 import Control.Monad               (Monad (return, (>>=)), when)
 import Control.Monad.IO.Class      (MonadIO (..))
 import Control.Monad.Trans.Control (MonadBaseControl (restoreM))
@@ -77,6 +77,14 @@ properties =
           _ <- LA.startWaitCatch la
           _ <- LA.startWaitCatch la
           return ()
+
+  , (,) "'startWait' on an applicative complex runs both actions" $ withTests 1 $ property $
+      expectTicks 2 $ \tick ->
+        LA.withLazyAsync tick $ \la1 ->
+        LA.withLazyAsync tick $ \la2 ->
+          do
+            _ <- LA.startWaitCatch (liftA2 (,) la1 la2)
+            return ()
 
   ]
 
