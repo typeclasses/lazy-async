@@ -58,6 +58,6 @@ chosen to produce the fail-fast behavior of 'LazyAsync'.
 
 * If any part of a complex is 'Failure', then the complex evaluates to
 'Failure', even if some parts are 'Incomplete'. For example,
-@'Incomplete' 'Control.Applicative.<*>' 'Failure' e@ = 'Failure' e.
+@'Incomplete' 'Control.Applicative.<*>' 'Failure' e@ = @'Failure' e@.
 
 -}
