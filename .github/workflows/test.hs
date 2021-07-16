@@ -9,7 +9,7 @@ main =
     callProcess "cabal" ("build" : "all" : constraints ghc)
     callProcess "cabal" ("test" : "all" : "--enable-tests" : constraints ghc)
 
-x .= Just y  = Just "--constraint=" ++ x ++ "==" ++ y
+x .= Just y  = Just ("--constraint=" ++ x ++ "==" ++ y)
 x .= Nothing = Nothing
 
 data GHC = GHC_8_10 | GHC_9_0
