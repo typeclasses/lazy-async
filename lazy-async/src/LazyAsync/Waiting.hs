@@ -45,7 +45,7 @@ waitIO = waitCatch >=> outcomeSuccess
 --
 -- If the action throws an exception, then the exception is re-thrown
 --
--- @'startWait' x@ = @'start' x '*>' 'wait' x@
+-- @('startWait' x)@ is equivalent to @('start' x '*>' 'wait' x)@
 startWait :: MonadIO m => LazyAsync a -> m a
 startWait x = start x *> wait x
 
@@ -56,8 +56,10 @@ startWaitIO ao = startIO ao *> waitIO ao
 -- | Starts an asynchronous action, waits for it to complete, and returns its value
 --
 -- If the action throws an exception, then the exception is returned
+--
+-- @('startWaitCatch' x)@ is equivalent to @('start' x '*>' 'waitCatch' x)@
 startWaitCatch :: MonadIO m => LazyAsync a -> m (Outcome a)
-startWaitCatch = liftIO . startWaitCatchIO
+startWaitCatch x = start x *> waitCatch x
 
 -- | Specialization of 'startWaitCatch'
 startWaitCatchIO :: LazyAsync a -> IO (Outcome a)
