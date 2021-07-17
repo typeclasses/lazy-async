@@ -90,7 +90,7 @@ properties =
           _ <- startWaitCatch la
           return ()
 
-  , (,) "'startWait' on an applicative complex runs both actions" $ example $
+  , (,) "'startWait' on a complex runs both actions" $ example $
       expectTicks 2 $ \tick ->
         withLazyAsync tick $ \la1 ->
         withLazyAsync tick $ \la2 ->
@@ -98,7 +98,7 @@ properties =
             _ <- startWaitCatch (liftA2 (,) la1 la2)
             return ()
 
-  , (,) "actions included in more than one applicative context still can only run once" $ example $
+  , (,) "actions included in multiple complexes still can only run once" $ example $
       expectTicks 3 $ \tick ->
         withLazyAsync tick $ \la1 ->
         withLazyAsync tick $ \la2 ->

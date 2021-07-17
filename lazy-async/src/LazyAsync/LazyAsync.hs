@@ -10,9 +10,10 @@ import LazyAsync.Async             (Async)
 
 -- | An asynchronous action that does not start right away
 data LazyAsync a =
-    A0 a
-  | A1 (TVar Bool) (Async a)
+    A0 a -- ^ Triviality that gives rise to 'pure'
+  | A1 (TVar Bool) (Async a) -- ^ A single action
   | forall x. A2 (LazyAsync (x -> a)) (LazyAsync x)
+        -- ^ A complex of two 'LazyAsync's
 
 instance Functor LazyAsync where
     f `fmap` A0 x   = A0 (f x)
@@ -20,40 +21,28 @@ instance Functor LazyAsync where
     f `fmap` A2 x y = A2 (fmap (fmap f) x) y
 
 -- | '<*>' = 'apply'
-instance Applicative LazyAsync where
-    pure = A0
-    (<*>) = A2
+instance Applicative LazyAsync where pure = A0; (<*>) = A2
 
-{- | Constructs a complex 'LazyAsync' that combines results from two other
-asynchronous actions.
-
-* When we 'LazyAsync.start' a complex, it starts all of its parts.
-
-* When we 'LazyAsync.wait' on a complex, it returns a 'LazyAsync.Success' result
-once all of its parts complete successfully.
-
-* When any part resolves to a 'LazyAsync.Failure' outcome, the complex fails and
-'LazyAsync.wait' throws an exception immediately.
-
-* When we 'LazyAsync.wait' on a complex that suffers failures in multiple parts,
-the exception thrown is the one that comes from the part that failed first
-chronologically.
-
-* When one part of a complex fails, the other parts remain running. This is
-because their results may still be wanted elsewhere.
-
-When we 'LazyAsync.poll' a complex that has suffered failures in multiple parts,
-we see the leftmost 'LazyAsync.Failure'. This can have potentially surprising
-consequences:
-
-* The exception we see when we 'LazyAsync.poll' a failed 'LazyAsync' might not
-be the same exception that was thrown by 'LazyAsync.wait'.
-
-* 'LazyAsync.poll'ing a failed 'LazyAsync' is not guaranteed to give the same
-exception each time.
-
--}
-apply ::
-    LazyAsync (a -> b) -> LazyAsync a
-    -> LazyAsync b -- ^ Complex
+apply :: LazyAsync (a -> b) -- ^ Left part
+      -> LazyAsync a        -- ^ Right part
+      -> LazyAsync b        -- ^ Complex of the left and right parts
 apply = A2
+{- ^
+Combines the results of two 'LazyAsync's
+
+The behavior of a complex 'LazyAsync':
+
+  * __'LazyAsync.start'__  — Starts all of the parts immediately
+
+  * __'LazyAsync.wait'__ — Returns a 'LazyAsync.Success' result after
+    all of the parts complete successfully. As soon as one part fails,
+    the whole complex fails immediately (but any 'LazyAsync.Incomplete'
+    parts keep running in the background)
+
+  * __'LazyAsync.poll'__ — Returns 'LazyAsync.Failure' if any part
+    has failed; otherwise 'LazyAsync.Incomplete' if any part has
+    not finished; otherwise 'LazyAsync.Success'
+
+If multiple parts of a complex fail, the 'LazyAsync.wait' and
+'LazyAsync.poll' operations only reveal one of the exceptions.
+"Which one?" is unspecified and not guaranteed to be consistent. -}
