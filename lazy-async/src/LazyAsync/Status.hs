@@ -30,12 +30,12 @@ instance Applicative Status where
 
 
 {- | Combines two 'LazyAsync.LazyAsync' statuses to produce a summary
-of the status of the overall complex.
+of the status of the overall complex
 
 If any part of a complex is 'Failure', then the complex evaluates to
-'Failure', even if some parts are 'Incomplete'.
+'Failure', even if some parts are 'Incomplete'
 
-For example, @'applyStatus' 'Incomplete' ('Failure' e)@ = @'Failure' e@. -}
+For example, @'applyStatus' 'Incomplete' ('Failure' e)@ = @'Failure' e@ -}
 applyStatus :: Status (a -> b) -> Status a -> Status b
 Done (Failure e) `applyStatus` _                = Done $ Failure e
 _                `applyStatus` Done (Failure e) = Done $ Failure e
