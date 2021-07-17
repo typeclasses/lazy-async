@@ -29,6 +29,7 @@ library
     import:             language, dependencies
     hs-source-dirs:     src
     exposed-modules:    LazyAsync
+    other-modules:      LazyAsync.Async
     other-modules:      LazyAsync.LazyAsync
     other-modules:      LazyAsync.Outcome
     other-modules:      LazyAsync.Polling

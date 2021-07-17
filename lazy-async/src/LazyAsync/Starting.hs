@@ -1,3 +1,5 @@
+{-# language Safe #-}
+
 module LazyAsync.Starting where
 
 import Control.Applicative    ((*>))

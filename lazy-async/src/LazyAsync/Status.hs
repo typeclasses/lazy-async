@@ -1,3 +1,5 @@
+{-# language Safe #-}
+
 module LazyAsync.Status where
 
 import Control.Applicative (Applicative (pure, (<*>)))

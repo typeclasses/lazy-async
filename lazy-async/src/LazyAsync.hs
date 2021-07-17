@@ -1,3 +1,5 @@
+{-# language Safe #-}
+
 module LazyAsync
   ( {- * Asynchronous actions -}  LazyAsync,
     {- * Spawning -}              withLazyAsync,

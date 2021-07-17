@@ -1,3 +1,5 @@
+{-# language Safe #-}
+
 module LazyAsync.Polling where
 
 import Control.Applicative    (pure, (<*>))
@@ -15,7 +17,7 @@ import LazyAsync.Outcome      (Outcome (Failure, Success))
 import LazyAsync.Status       (Status (Done, Incomplete))
 import System.IO              (IO)
 
-import qualified Control.Concurrent.Async.Lifted as Async
+import qualified LazyAsync.Async as Async
 
 -- | Checks whether an asynchronous action has completed yet
 --

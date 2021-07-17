@@ -1,16 +1,18 @@
+{-# language Safe #-}
+
 module LazyAsync.Spawning (withLazyAsync, withLazyAsyncIO) where
 
-import Control.Applicative             ((*>))
-import Control.Concurrent.Async.Lifted (withAsync)
-import Control.Concurrent.STM          (atomically, check)
-import Control.Concurrent.STM.TVar     (TVar, newTVarIO, readTVar)
-import Control.Monad                   ((>>=))
-import Control.Monad.Base              (MonadBase, liftBase)
-import Control.Monad.Trans.Control     (MonadBaseControl, StM)
-import Data.Bool                       (Bool (False))
-import Data.Function                   (($), (.))
-import LazyAsync.LazyAsync             (LazyAsync (A1))
-import System.IO                       (IO)
+import Control.Applicative         ((*>))
+import Control.Concurrent.STM      (atomically, check)
+import Control.Concurrent.STM.TVar (TVar, newTVarIO, readTVar)
+import Control.Monad               ((>>=))
+import Control.Monad.Base          (MonadBase, liftBase)
+import Control.Monad.Trans.Control (MonadBaseControl, StM)
+import Data.Bool                   (Bool (False))
+import Data.Function               (($), (.))
+import LazyAsync.Async             (withAsync)
+import LazyAsync.LazyAsync         (LazyAsync (A1))
+import System.IO                   (IO)
 
 {- | Creates a situation wherein:
 

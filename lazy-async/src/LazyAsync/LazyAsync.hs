@@ -1,10 +1,12 @@
+{-# language Safe #-}
+
 module LazyAsync.LazyAsync where
 
-import Control.Applicative             (Applicative (pure, (<*>)))
-import Control.Concurrent.Async.Lifted (Async)
-import Control.Concurrent.STM.TVar     (TVar)
-import Data.Bool                       (Bool)
-import Data.Functor                    (Functor (fmap))
+import Control.Applicative         (Applicative (pure, (<*>)))
+import Control.Concurrent.STM.TVar (TVar)
+import Data.Bool                   (Bool)
+import Data.Functor                (Functor (fmap))
+import LazyAsync.Async             (Async)
 
 -- | An asynchronous action that does not start right away
 data LazyAsync a =
