@@ -16,8 +16,8 @@ import System.IO                   (IO)
 
 {- | Creates a situation wherein:
 
-  * The action shall begin running only once it is needed (that is, until prompted by 'LazyAsync.Starting.start')
-  * The action shall run asynchronously (other than where it is 'LazyAsync.Waiting.wait'ed upon)
+  * The action shall begin running only once it is needed (that is, until prompted by 'LazyAsync.start')
+  * The action shall run asynchronously (other than where it is 'LazyAsync.wait'ed upon)
   * The action shall run at most once
   * The action shall run only within the continuation (when the continuation ends, the action is stopped)
 -}

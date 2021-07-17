@@ -8,7 +8,12 @@ import Data.Function       (($))
 import Data.Functor        (Functor (fmap))
 import Text.Show           (Show)
 
-data Outcome a = Failure SomeException | Success a
+-- | The result of a 'LazyAsync.LazyAsync' that is 'LazyAsync.Done' running
+--
+-- Obtained using 'LazyAsync.waitCatch'
+data Outcome a =
+    Failure SomeException -- ^ The 'LazyAsync.LazyAsync.LazyAsync' action threw an exception
+  | Success a -- ^ The 'LazyAsync.LazyAsync.LazyAsync' action completed normally
     deriving Show
 
 instance Functor Outcome where
