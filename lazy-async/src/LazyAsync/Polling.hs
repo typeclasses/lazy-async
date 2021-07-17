@@ -8,7 +8,6 @@ import Control.Exception      (SomeException)
 import Control.Monad          (return)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Either            (Either (Left, Right))
-import Data.Function          ((.))
 import Data.Functor           ((<&>))
 import Data.Functor.Compose   (Compose (Compose, getCompose))
 import Data.Maybe             (Maybe (Just, Nothing))
@@ -23,11 +22,11 @@ import qualified LazyAsync.Async as Async
 --
 -- Does __not__ start the action
 poll :: MonadIO m => LazyAsync a -> m (Status a)
-poll = liftIO  . pollIO
+poll la = liftIO (pollIO la)
 
 -- | Specialization of 'poll'
 pollIO :: LazyAsync a -> IO (Status a)
-pollIO = atomically . pollSTM
+pollIO la = atomically (pollSTM la)
 
 -- | Same as 'poll', but in 'STM'
 pollSTM :: LazyAsync a -> STM (Status a)

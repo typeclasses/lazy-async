@@ -7,7 +7,6 @@ import Control.Concurrent.STM (STM, atomically, retry)
 import Control.Monad          (return, (>=>))
 import Control.Monad.Catch    (MonadThrow, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
-import Data.Function          ((.))
 import LazyAsync.LazyAsync    (LazyAsync)
 import LazyAsync.Outcome      (Outcome (Failure, Success))
 import LazyAsync.Polling      (pollSTM)
@@ -25,11 +24,11 @@ waitCatchSTM = pollSTM >=> statusOutcomeSTM
 --
 -- Does __not__ start the action
 waitCatch :: MonadIO m => LazyAsync a -> m (Outcome a)
-waitCatch = liftIO . waitCatchIO
+waitCatch la = liftIO (waitCatchIO la)
 
 -- | Specialization of 'waitCatch'
 waitCatchIO :: LazyAsync a -> IO (Outcome a)
-waitCatchIO = atomically . waitCatchSTM
+waitCatchIO la = atomically (waitCatchSTM la)
 
 -- | Waits for the action to complete, and returns its value
 --
@@ -37,7 +36,7 @@ waitCatchIO = atomically . waitCatchSTM
 --
 -- Does __not__ start the action
 wait :: MonadIO m => LazyAsync a -> m a
-wait = liftIO . waitIO
+wait la = liftIO (waitIO la)
 
 -- | Specialization of 'wait'
 waitIO :: LazyAsync a -> IO a

@@ -9,7 +9,6 @@ import Control.Monad               ((>>=))
 import Control.Monad.Base          (MonadBase, liftBase)
 import Control.Monad.Trans.Control (MonadBaseControl, StM)
 import Data.Bool                   (Bool (False))
-import Data.Function               ((.))
 import LazyAsync.Async             (withAsync)
 import LazyAsync.LazyAsync         (LazyAsync (A1))
 import System.IO                   (IO)
@@ -26,7 +25,7 @@ withLazyAsync :: MonadBaseControl IO m =>
     -> (LazyAsync (StM m a) -> m b) -- ^ Continuation
     -> m b
 withLazyAsync action continue =
-    newTVar False >>= \s -> withAsync (waitForTrue s *> action) (continue . A1 s)
+    newTVar False >>= \s -> withAsync (waitForTrue s *> action) (\a -> continue (A1 s a))
 
 -- | Specialization of 'withLazyAsync'
 withLazyAsyncIO ::
@@ -39,4 +38,4 @@ waitForTrue :: MonadBase IO m => TVar Bool -> m ()
 waitForTrue x = liftBase (atomically (readTVar x >>= check))
 
 newTVar :: MonadBase IO m => a -> m (TVar a)
-newTVar = liftBase . newTVarIO
+newTVar x = liftBase (newTVarIO x)

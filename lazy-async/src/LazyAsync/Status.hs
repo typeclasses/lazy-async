@@ -3,7 +3,6 @@
 module LazyAsync.Status where
 
 import Control.Applicative (Applicative (pure, (<*>)))
-import Data.Function       ((.))
 import Data.Functor        (Functor (fmap))
 import LazyAsync.Outcome   (Outcome (Failure, Success))
 import Text.Show           (Show)
@@ -25,7 +24,7 @@ instance Functor Status where
 
 -- | '<*>' = 'applyStatus'
 instance Applicative Status where
-    pure = Done . pure
+    pure x = Done (pure x)
     (<*>) = applyStatus
 
 
