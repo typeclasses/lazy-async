@@ -29,8 +29,8 @@ asynchronous actions.
 
 * When we 'LazyAsync.Starting.start' a complex, it starts all of its parts.
 
-* When we 'LazyAsync.Waiting.wait' on a complex, it returns a 'Success' result
-once all of its parts complete successfully.
+* When we 'LazyAsync.Waiting.wait' on a complex, it returns a
+'LazyAsync.Outcome.Success' result once all of its parts complete successfully.
 
 * When any part resolves to a 'LazyAsync.Outcome.Failure' outcome, the complex
 fails and 'LazyAsync.Waiting.wait' throws an exception immediately.
