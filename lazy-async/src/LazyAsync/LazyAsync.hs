@@ -43,6 +43,7 @@ The behavior of a complex 'LazyAsync':
     has failed; otherwise 'LazyAsync.Incomplete' if any part has
     not finished; otherwise 'LazyAsync.Success'
 
-If multiple parts of a complex fail, the 'LazyAsync.wait' and
-'LazyAsync.poll' operations only reveal one of the exceptions.
-"Which one?" is unspecified and not guaranteed to be consistent. -}
+If multiple parts of a complex fail, the 'LazyAsync.wait' and 'LazyAsync.poll'
+operations only reveal one of the exceptions. Which one? — The leftmost
+exception of the asyncs that have failed so far. Since this may change, which
+exception is visible is not necessarily consistent over time. -}
