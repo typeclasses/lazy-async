@@ -11,7 +11,7 @@ import Data.Either            (Either (Left, Right))
 import Data.Functor           ((<&>))
 import Data.Functor.Compose   (Compose (Compose, getCompose))
 import Data.Maybe             (Maybe (Just, Nothing))
-import LazyAsync.LazyAsync    (LazyAsync (A0, A1, A2))
+import LazyAsync.LazyAsync    (LazyAsync (A0, A1, Ap))
 import LazyAsync.Outcome      (Outcome (Failure, Success))
 import LazyAsync.Status       (Status (Done, Incomplete))
 import System.IO              (IO)
@@ -32,7 +32,7 @@ pollIO la = atomically (pollSTM la)
 pollSTM :: LazyAsync a -> STM (Status a)
 pollSTM (A0 x)   = return (pure x)
 pollSTM (A1 _ a) = Async.pollSTM a <&> maybeEitherStatus
-pollSTM (A2 x y) = getCompose (Compose (pollSTM x) <*> Compose (pollSTM y))
+pollSTM (Ap x y) = getCompose (Compose (pollSTM x) <*> Compose (pollSTM y))
 
 eitherDone :: Either SomeException a -> Outcome a
 eitherDone (Left e)  = Failure e

@@ -12,21 +12,21 @@ import LazyAsync.Async             (Async)
 data LazyAsync a =
     A0 a -- ^ Triviality that gives rise to 'pure'
   | A1 (TVar Bool) (Async a) -- ^ A single action
-  | forall x. A2 (LazyAsync (x -> a)) (LazyAsync x)
+  | forall x. Ap (LazyAsync (x -> a)) (LazyAsync x)
         -- ^ A complex of two 'LazyAsync's
 
 instance Functor LazyAsync where
     f `fmap` A0 x   = A0 (f x)
     f `fmap` A1 s a = A1 s (fmap f a)
-    f `fmap` A2 x y = A2 (fmap (fmap f) x) y
+    f `fmap` Ap x y = Ap (fmap (fmap f) x) y
 
 -- | '<*>' = 'apply'
-instance Applicative LazyAsync where pure = A0; (<*>) = A2
+instance Applicative LazyAsync where pure = A0; (<*>) = Ap
 
 apply :: LazyAsync (a -> b) -- ^ Left part
       -> LazyAsync a        -- ^ Right part
       -> LazyAsync b        -- ^ Complex of the left and right parts
-apply = A2
+apply = Ap
 {- ^
 Combines the results of two 'LazyAsync's
 
