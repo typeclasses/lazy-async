@@ -46,7 +46,7 @@ When we 'LazyAsync.poll' a complex that has suffered failures in multiple parts,
 we see the leftmost 'LazyAsync.Failure'. This can have potentially surprising
 consequences:
 
-* Whe exception we see when we 'LazyAsync.poll' a failed 'LazyAsync' might not
+* The exception we see when we 'LazyAsync.poll' a failed 'LazyAsync' might not
 be the same exception that was thrown by 'LazyAsync.wait'.
 
 * 'LazyAsync.poll'ing a failed 'LazyAsync' is not guaranteed to give the same
