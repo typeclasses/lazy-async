@@ -4,7 +4,6 @@ module LazyAsync.Outcome where
 
 import Control.Applicative (Applicative (pure, (<*>)))
 import Control.Exception   (SomeException)
-import Data.Function       (($))
 import Data.Functor        (Functor (fmap))
 import Text.Show           (Show)
 
@@ -33,4 +32,4 @@ applyOutcome fo ao =
         Success f ->
             case ao of
                 Failure e -> Failure e
-                Success x -> Success $ f x
+                Success x -> Success (f x)

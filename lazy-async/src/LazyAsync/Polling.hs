@@ -8,7 +8,7 @@ import Control.Exception      (SomeException)
 import Control.Monad          (return)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Either            (Either (Left, Right))
-import Data.Function          (($), (.))
+import Data.Function          ((.))
 import Data.Functor           ((<&>))
 import Data.Functor.Compose   (Compose (Compose, getCompose))
 import Data.Maybe             (Maybe (Just, Nothing))
@@ -31,9 +31,9 @@ pollIO = atomically . pollSTM
 
 -- | Same as 'poll', but in 'STM'
 pollSTM :: LazyAsync a -> STM (Status a)
-pollSTM (A0 x)   = return $ pure x
+pollSTM (A0 x)   = return (pure x)
 pollSTM (A1 _ a) = Async.pollSTM a <&> maybeEitherStatus
-pollSTM (A2 x y) = getCompose $ Compose (pollSTM x) <*> Compose (pollSTM y)
+pollSTM (A2 x y) = getCompose (Compose (pollSTM x) <*> Compose (pollSTM y))
 
 eitherDone :: Either SomeException a -> Outcome a
 eitherDone (Left e)  = Failure e

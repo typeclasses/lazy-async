@@ -3,7 +3,7 @@
 module LazyAsync.Status where
 
 import Control.Applicative (Applicative (pure, (<*>)))
-import Data.Function       (($), (.))
+import Data.Function       ((.))
 import Data.Functor        (Functor (fmap))
 import LazyAsync.Outcome   (Outcome (Failure, Success))
 import Text.Show           (Show)
@@ -37,7 +37,7 @@ If any part of a complex is 'Failure', then the complex evaluates to
 
 For example, @'applyStatus' 'Incomplete' ('Failure' e)@ = @'Failure' e@ -}
 applyStatus :: Status (a -> b) -> Status a -> Status b
-Done (Failure e) `applyStatus` _                = Done $ Failure e
-_                `applyStatus` Done (Failure e) = Done $ Failure e
-Done (Success f) `applyStatus` Done (Success x) = Done $ Success $ f x
+Done (Failure e) `applyStatus` _                = Done (Failure e)
+_                `applyStatus` Done (Failure e) = Done (Failure e)
+Done (Success f) `applyStatus` Done (Success x) = Done (Success (f x))
 _                `applyStatus` _                = Incomplete
