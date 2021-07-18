@@ -1,6 +1,9 @@
 {-# language Safe #-}
 
-module LazyAsync.Spawning (withLazyAsync, withLazyAsyncIO) where
+module LazyAsync.Spawning
+  ( withLazyAsync, withLazyAsyncIO
+  , lazyAsyncCont, lazyAsyncContIO
+  ) where
 
 import Control.Applicative         ((*>))
 import Control.Concurrent.STM      (atomically, check)
@@ -12,6 +15,7 @@ import Data.Bool                   (Bool (False))
 import LazyAsync.Async             (withAsync)
 import LazyAsync.LazyAsync         (LazyAsync (A1))
 import System.IO                   (IO)
+import Control.Monad.Trans.Cont
 
 {- | Creates a situation wherein:
 
@@ -39,3 +43,13 @@ waitForTrue x = liftBase (atomically (readTVar x >>= check))
 
 newTVar :: MonadBase IO m => a -> m (TVar a)
 newTVar x = liftBase (newTVarIO x)
+
+-- | 'withLazyAsync' wrapped in the 'Cont.ContT' constructor
+--
+
+lazyAsyncCont :: MonadBaseControl IO m => m a -> ContT r m (LazyAsync (StM m a))
+lazyAsyncCont action = ContT (withLazyAsync action)
+
+-- | Specialization of 'lazyAsyncCont'
+lazyAsyncContIO :: IO a -> ContT r IO (LazyAsync a)
+lazyAsyncContIO action = ContT (withLazyAsyncIO action)
