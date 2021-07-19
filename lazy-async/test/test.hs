@@ -3,21 +3,17 @@ module Main (main) where
 import LazyAsync
 
 import Test.Counter
+import Test.Exceptions
 import Test.Optics
 
 import Control.Concurrent (threadDelay)
 import Data.Bool          (not)
-import Data.Eq            (Eq)
 import Data.Foldable      (traverse_)
 import Data.Function      (($), (.))
-import Data.Maybe         (Maybe (Just))
-import Prelude            (Integer)
 import System.Exit        (exitFailure)
 import System.IO          (IO)
-import Text.Show          (Show)
 
-import Control.Exception (ArithException (DivideByZero),
-                          Exception (fromException), SomeException, throw)
+import Control.Exception (ArithException (DivideByZero))
 
 import Control.Applicative         (liftA2)
 import Control.Monad               (Monad (return, (>>=)), replicateM_, when)
@@ -26,8 +22,8 @@ import Control.Monad.Trans.Class   (MonadTrans (lift))
 import Control.Monad.Trans.Cont    (evalContT)
 import Control.Monad.Trans.Control (MonadBaseControl (restoreM))
 
-import Hedgehog (Group, MonadTest, Property, PropertyT, annotate, checkParallel,
-                 discover, property, withTests, (===))
+import Hedgehog (Group, Property, PropertyT, annotate, checkParallel, discover,
+                 property, withTests, (===))
 
 
 main :: IO ()
@@ -35,6 +31,9 @@ main = checkParallel group >>= \ok -> when (not ok) exitFailure
 
 group :: Group
 group = $$(discover)
+
+example :: PropertyT IO () -> Property
+example = withTests 1 . property
 
 pause :: MonadIO m => m ()
 pause = liftIO $ threadDelay 1000000
@@ -133,12 +132,3 @@ prop_complexOnce = example $ evalContT $ do
 
     traverse_ start [a, b, c]
     traverse_ wait [a, b, c]
-
-throw' :: Exception e => e -> m Integer
-throw' = throw
-
-example :: PropertyT IO () -> Property
-example = withTests 1 . property
-
-exceptionIs :: MonadTest m => (Exception e, Eq e, Show e) => e -> SomeException -> m ()
-exceptionIs a b = Just a === fromException b
