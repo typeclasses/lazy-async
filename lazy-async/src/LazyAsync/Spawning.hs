@@ -21,7 +21,9 @@ import System.IO                   (IO)
   * The action shall run at most once
   * The action shall run only within the continuation (when the continuation ends, the action is stopped)
 -}
-lazyAsync :: MonadBaseControl IO m => m a -> ContT r m (LazyAsync (StM m a))
+lazyAsync :: MonadBaseControl IO m =>
+    m a -- ^ Action
+    -> ContT r m (LazyAsync (StM m a))
 lazyAsync action = ContT (withLazyAsync action)
 
 -- | Specialization of 'lazyAsync'
