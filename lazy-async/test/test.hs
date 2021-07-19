@@ -15,12 +15,9 @@ import System.IO          (IO)
 
 import Control.Exception (ArithException (DivideByZero))
 
-import Control.Applicative         (liftA2)
-import Control.Monad               (Monad (return, (>>=)), replicateM_, when)
-import Control.Monad.IO.Class      (MonadIO (..))
-import Control.Monad.Trans.Class   (MonadTrans (lift))
-import Control.Monad.Trans.Cont    (evalContT)
-import Control.Monad.Trans.Control (MonadBaseControl (restoreM))
+import Control.Applicative       (liftA2)
+import Control.Monad             (Monad (return, (>>=)), replicateM_, when)
+import Control.Monad.Trans.Class (MonadTrans (lift))
 
 import Hedgehog (Group, Property, PropertyT, annotate, checkParallel, discover,
                  property, withTests, (===))
