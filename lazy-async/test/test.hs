@@ -27,8 +27,8 @@ import Control.Monad.Trans.Control (MonadBaseControl (restoreM))
 import Control.Concurrent.STM (TVar, atomically, newTVarIO, readTVar,
                                readTVarIO, writeTVar)
 
-import Hedgehog (Group (Group), MonadTest, Property, PropertyName, PropertyT,
-                 checkParallel, failure, property, withTests, (===))
+import Hedgehog (Group, MonadTest, Property, PropertyT, annotate, checkParallel,
+                 discover, failure, property, withTests, (===))
 
 import Optics.AffineFold (An_AffineFold, preview)
 import Optics.Optic      (Is, Optic')
@@ -41,97 +41,92 @@ main :: IO ()
 main = checkParallel group >>= \ok -> when (not ok) exitFailure
 
 group :: Group
-group = Group "LazyAsync" properties
+group = $$(discover)
 
 pause :: MonadIO m => m ()
 pause = liftIO $ threadDelay 1000000
 
-properties :: [(PropertyName, Property)]
-properties =
+prop_noAutoStart :: Property
+prop_noAutoStart = example $ evalContT $ do
+    annotate "'LazyAsync' does not start automatically"
+    tick <- expectTicks 0
+    la <- lazyAsyncCont tick
+    pause
+    poll la >>= focus _Incomplete
 
-  [ (,) "'LazyAsync' does not start automatically" $
-    example $ evalContT $
-    do
-      tick <- expectTicks 0
-      la <- lazyAsyncCont tick
-      pause
-      poll la >>= focus _Incomplete
+prop_start :: Property
+prop_start = example $ evalContT $ do
+    annotate "'start' prompts a 'LazyAsync' to run"
+    tick <- expectTicks 1
+    la <- lazyAsyncCont tick
+    start la
+    pause
 
-  , (,) "'start' prompts a 'LazyAsync' to run" $
-    example $ evalContT $
-    do
-      tick <- expectTicks 1
-      la <- lazyAsyncCont tick
-      start la
-      pause
+prop_startWait :: Property
+prop_startWait = example $ evalContT $ do
+    annotate "'startWait' prompts a 'LazyAsync' to run"
+    tick <- expectTicks 1
+    la <- lazyAsyncCont tick
+    _ <- startWait la
+    return ()
 
-  , (,) "'startWait' prompts a 'LazyAsync' to run" $
-    example $ evalContT $
-    do
-      tick <- expectTicks 1
-      la <- lazyAsyncCont tick
-      _ <- startWait la
-      return ()
+prop_start_idemotent :: Property
+prop_start_idemotent = example $ evalContT $ do
+    annotate "'start' is idempotent"
+    tick <- expectTicks 1
+    la <- lazyAsyncCont tick
+    start la
+    start la
+    pause
 
-  , (,) "'start' is idempotent" $
-    example $ evalContT $
-    do
-      tick <- expectTicks 1
-      la <- lazyAsyncCont tick
-      start la
-      start la
-      pause
+prop_startWait_idemotent :: Property
+prop_startWait_idemotent = example $ evalContT $ do
+    annotate "'startWait' is idemponent"
+    tick <- expectTicks 1
+    la <- lazyAsyncCont tick
+    lift $ startWait la >>= restoreM >>= (=== 1)
+    lift $ startWait la >>= restoreM >>= (=== 1)
+    return ()
 
-  , (,) "'startWait' is idemponent" $
-    example $ evalContT $
-    do
-      tick <- expectTicks 1
-      la <- lazyAsyncCont tick
-      lift $ startWait la >>= restoreM >>= (=== 1)
-      lift $ startWait la >>= restoreM >>= (=== 1)
-      return ()
+prop_startWaitCatch :: Property
+prop_startWaitCatch = example $ evalContT $ do
+    annotate "'startWaitCatch' catches exceptions"
+    la <- lazyAsyncCont (throw' DivideByZero)
+    startWaitCatch la >>= focus _Failure >>= exceptionIs DivideByZero
 
-  , (,) "'startWaitCatch' catches exceptions" $
-    example $ evalContT $
-    do
-      la <- lazyAsyncCont (throw' DivideByZero)
-      startWaitCatch la >>= focus _Failure >>= exceptionIs DivideByZero
+prop_startWaitCatch_idempotent :: Property
+prop_startWaitCatch_idempotent = example $ evalContT $ do
+    annotate "'startWaitCatch' is idempotent"
+    tick <- expectTicks 1
+    la <- lazyAsyncCont tick
+    _ <- startWaitCatch la
+    _ <- startWaitCatch la
+    return ()
 
-  , (,) "'startWaitCatch' is idempotent" $
-    example $ evalContT $
-    do
-      tick <- expectTicks 1
-      la <- lazyAsyncCont tick
-      _ <- startWaitCatch la
-      _ <- startWaitCatch la
-      return ()
+prop_startWait_both :: Property
+prop_startWait_both = example $ evalContT $ do
+    annotate "'startWait' on a complex runs both actions"
+    tick <- expectTicks 2
+    la1 <- lazyAsyncCont tick
+    la2 <- lazyAsyncCont tick
+    _ <- startWaitCatch (liftA2 (,) la1 la2)
+    return ()
 
-  , (,) "'startWait' on a complex runs both actions" $
-    example $ evalContT $
-    do
-      tick <- expectTicks 2
-      la1 <- lazyAsyncCont tick
-      la2 <- lazyAsyncCont tick
-      _ <- startWaitCatch (liftA2 (,) la1 la2)
-      return ()
+prop_complexOnce :: Property
+prop_complexOnce = example $ evalContT $ do
+    annotate "actions included in multiple complexes still can only run once"
+    tick <- expectTicks 3
 
-  , (,) "actions included in multiple complexes still can only run once" $
-    example $ evalContT $
-    do
-      tick <- expectTicks 3
+    la1 <- lazyAsyncCont tick
+    la2 <- lazyAsyncCont tick
+    la3 <- lazyAsyncCont tick
 
-      la1 <- lazyAsyncCont tick
-      la2 <- lazyAsyncCont tick
-      la3 <- lazyAsyncCont tick
+    let a = liftA2 (,) la1 la2
+        b = liftA2 (,) la3 la2
+        c = liftA2 (,) la1 la3
 
-      let a = liftA2 (,) la1 la2
-          b = liftA2 (,) la3 la2
-          c = liftA2 (,) la1 la3
-
-      traverse_ start [a, b, c]
-      traverse_ wait [a, b, c]
-
-  ]
+    traverse_ start [a, b, c]
+    traverse_ wait [a, b, c]
 
 throw' :: Exception e => e -> m Integer
 throw' = throw
