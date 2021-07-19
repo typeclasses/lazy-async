@@ -8,7 +8,15 @@ import LazyAsync.Spawning          (lazyAsync, lazyAsyncIO)
 import LazyAsync.Waiting           (startWait, startWaitIO)
 import System.IO                   (IO)
 
-memoize :: (MonadIO m, MonadBaseControl IO m) => m a -> ContT r m (m a)
+{- | Creates a situation wherein:
+
+  * The action shall begin running only once the memoized action runs
+  * The action shall run at most once
+  * The action shall run only within the continuation (when the continuation ends, the action is stopped)
+-}
+memoize :: (MonadIO m, MonadBaseControl IO m) =>
+    m a -- ^ Action
+    -> ContT r m (m a) -- ^ Memoized action, in a continuation
 memoize action = fmap (\la -> startWait la >>= restoreM) (lazyAsync action)
 
 -- | Specialization of 'memoize'
