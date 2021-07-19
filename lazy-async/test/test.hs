@@ -18,7 +18,7 @@ import Control.Exception (ArithException (DivideByZero),
                           Exception (fromException), SomeException, throw)
 
 import Control.Applicative         (liftA2)
-import Control.Monad               (Monad (return, (>>=)), when)
+import Control.Monad               (Monad (return, (>>=)), when, replicateM_)
 import Control.Monad.IO.Class      (MonadIO (..))
 import Control.Monad.Trans.Class   (MonadTrans (lift))
 import Control.Monad.Trans.Cont    (ContT (ContT), evalContT)
@@ -54,6 +54,14 @@ prop_noAutoStart = example $ evalContT $ do
     pause
     poll la >>= focus _Incomplete
 
+prop_memoize_noAutoStart :: Property
+prop_memoize_noAutoStart = example $ evalContT $ do
+    annotate "'memoize' does not start the action"
+    tick <- expectTicks 0
+    _ <- memoize tick
+    pause
+    return ()
+
 prop_start :: Property
 prop_start = example $ evalContT $ do
     annotate "'start' prompts a 'LazyAsync' to run"
@@ -75,8 +83,7 @@ prop_start_idempotent = example $ evalContT $ do
     annotate "'start' is idempotent"
     tick <- expectTicks 1
     la <- lazyAsyncCont tick
-    start la
-    start la
+    replicateM_ 2 $ start la
     pause
 
 prop_startWait_idempotent :: Property
@@ -84,8 +91,15 @@ prop_startWait_idempotent = example $ evalContT $ do
     annotate "'startWait' is idemponent"
     tick <- expectTicks 1
     la <- lazyAsyncCont tick
-    lift $ startWait la >>= restoreM >>= (=== 1)
-    lift $ startWait la >>= restoreM >>= (=== 1)
+    lift $ replicateM_ 2 $ startWait la >>= restoreM >>= (=== 1)
+    return ()
+
+prop_memoize_idempotent :: Property
+prop_memoize_idempotent = example $ evalContT $ do
+    annotate "The action returned by 'memoize' is idempotent"
+    tick <- expectTicks 1
+    tick' <- memoize tick
+    lift $ replicateM_ 2 $ tick' >>= (=== 1)
     return ()
 
 prop_startWaitCatch :: Property
@@ -99,8 +113,7 @@ prop_startWaitCatch_idempotent = example $ evalContT $ do
     annotate "'startWaitCatch' is idempotent"
     tick <- expectTicks 1
     la <- lazyAsyncCont tick
-    _ <- startWaitCatch la
-    _ <- startWaitCatch la
+    replicateM_ 2 $ startWaitCatch la
     return ()
 
 prop_startWait_both :: Property
