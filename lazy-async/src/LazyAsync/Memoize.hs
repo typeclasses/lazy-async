@@ -11,6 +11,6 @@ import System.IO                   (IO)
 memoize :: (MonadIO m, MonadBaseControl IO m) => m a -> ContT r m (m a)
 memoize action = fmap (\la -> startWait la >>= restoreM) (lazyAsyncCont action)
 
--- Specialization of 'memoize'
+-- | Specialization of 'memoize'
 memoizeIO :: IO a -> ContT r IO (IO a)
 memoizeIO action = fmap startWaitIO (lazyAsyncContIO action)
