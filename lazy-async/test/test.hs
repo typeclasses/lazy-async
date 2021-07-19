@@ -1,7 +1,6 @@
 module Main (main) where
 
-import LazyAsync (Outcome, Status, poll, start, startWait, startWaitCatch, wait,
-                  withLazyAsync)
+import LazyAsync
 
 import Control.Concurrent (threadDelay)
 import Data.Bool          (not)
@@ -21,6 +20,8 @@ import Control.Exception (ArithException (DivideByZero),
 import Control.Applicative         (liftA2)
 import Control.Monad               (Monad (return, (>>=)), when)
 import Control.Monad.IO.Class      (MonadIO (..))
+import Control.Monad.Trans.Class   (MonadTrans (lift))
+import Control.Monad.Trans.Cont    (ContT (ContT), evalContT)
 import Control.Monad.Trans.Control (MonadBaseControl (restoreM))
 
 import Control.Concurrent.STM (TVar, atomically, newTVarIO, readTVar,
@@ -48,69 +49,92 @@ pause = liftIO $ threadDelay 1000000
 properties :: [(PropertyName, Property)]
 properties =
 
-  [ (,) "'LazyAsync' does not start automatically" $ example $
-      expectTicks 0 $ \tick -> withLazyAsync tick $ \la ->
-        do
-          pause
-          poll la >>= focus _Incomplete
+  [ (,) "'LazyAsync' does not start automatically" $
+    example $ evalContT $
+    do
+      tick <- expectTicks 0
+      la <- lazyAsyncCont tick
+      pause
+      poll la >>= focus _Incomplete
 
-  , (,) "'start' prompts a 'LazyAsync' to run" $ example $
-      expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
-        do
-          start la
-          pause
+  , (,) "'start' prompts a 'LazyAsync' to run" $
+    example $ evalContT $
+    do
+      tick <- expectTicks 1
+      la <- lazyAsyncCont tick
+      start la
+      pause
 
-  , (,) "'startWait' prompts a 'LazyAsync' to run" $ example $
-      expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
-        do
-          _ <- startWait la
-          return ()
+  , (,) "'startWait' prompts a 'LazyAsync' to run" $
+    example $ evalContT $
+    do
+      tick <- expectTicks 1
+      la <- lazyAsyncCont tick
+      _ <- startWait la
+      return ()
 
-  , (,) "'start' is idempotent" $ example $
-      expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
-        do
-          start la
-          start la
-          pause
+  , (,) "'start' is idempotent" $
+    example $ evalContT $
+    do
+      tick <- expectTicks 1
+      la <- lazyAsyncCont tick
+      start la
+      start la
+      pause
 
-  , (,) "'startWait' is idemponent" $ example $
-      expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
-        do
-          startWait la >>= restoreM >>= (=== 1)
-          startWait la >>= restoreM >>= (=== 1)
+  , (,) "'startWait' is idemponent" $
+    example $ evalContT $
+    do
+      tick <- expectTicks 1
+      la <- lazyAsyncCont tick
+      lift $ startWait la >>= restoreM >>= (=== 1)
+      lift $ startWait la >>= restoreM >>= (=== 1)
+      return ()
 
-  , (,) "'startWaitCatch' catches exceptions" $ example $
-      withLazyAsync (throw DivideByZero :: PropertyT IO Integer) $ \la ->
-          startWaitCatch la >>= focus _Failure >>= exceptionIs DivideByZero
+  , (,) "'startWaitCatch' catches exceptions" $
+    example $ evalContT $
+    do
+      la <- lazyAsyncCont (throw' DivideByZero)
+      startWaitCatch la >>= focus _Failure >>= exceptionIs DivideByZero
 
-  , (,) "'startWaitCatch' is idempotent" $ example $
-      expectTicks 1 $ \tick -> withLazyAsync tick $ \la ->
-        do
-          _ <- startWaitCatch la
-          _ <- startWaitCatch la
-          return ()
+  , (,) "'startWaitCatch' is idempotent" $
+    example $ evalContT $
+    do
+      tick <- expectTicks 1
+      la <- lazyAsyncCont tick
+      _ <- startWaitCatch la
+      _ <- startWaitCatch la
+      return ()
 
-  , (,) "'startWait' on a complex runs both actions" $ example $
-      expectTicks 2 $ \tick ->
-        withLazyAsync tick $ \la1 ->
-        withLazyAsync tick $ \la2 ->
-          do
-            _ <- startWaitCatch (liftA2 (,) la1 la2)
-            return ()
+  , (,) "'startWait' on a complex runs both actions" $
+    example $ evalContT $
+    do
+      tick <- expectTicks 2
+      la1 <- lazyAsyncCont tick
+      la2 <- lazyAsyncCont tick
+      _ <- startWaitCatch (liftA2 (,) la1 la2)
+      return ()
 
-  , (,) "actions included in multiple complexes still can only run once" $ example $
-      expectTicks 3 $ \tick ->
-        withLazyAsync tick $ \la1 ->
-        withLazyAsync tick $ \la2 ->
-        withLazyAsync tick $ \la3 ->
-          do
-            let a = liftA2 (,) la1 la2
-                b = liftA2 (,) la3 la2
-                c = liftA2 (,) la1 la3
-            traverse_ start [a, b, c]
-            traverse_ wait [a, b, c]
+  , (,) "actions included in multiple complexes still can only run once" $
+    example $ evalContT $
+    do
+      tick <- expectTicks 3
+
+      la1 <- lazyAsyncCont tick
+      la2 <- lazyAsyncCont tick
+      la3 <- lazyAsyncCont tick
+
+      let a = liftA2 (,) la1 la2
+          b = liftA2 (,) la3 la2
+          c = liftA2 (,) la1 la3
+
+      traverse_ start [a, b, c]
+      traverse_ wait [a, b, c]
 
   ]
+
+throw' :: Exception e => e -> m Integer
+throw' = throw
 
 example :: PropertyT IO () -> Property
 example = withTests 1 . property
@@ -134,13 +158,14 @@ type Tick m = m Natural
 
 expectTicks :: (MonadIO m, MonadTest m) =>
     Natural -- ^ Expected number of times the 'Tick' action runs
-    -> (Tick m -> m b) -> m b
-expectTicks n run =
+    -> ContT r m (Tick m)
+expectTicks n = ContT (\run ->
   do
     counter <- newCounter
     x <- run (tickCounter counter)
     assertCount counter n
     return x
+  )
 
 focus :: (MonadTest m, Is k An_AffineFold) => Optic' k is s a -> s -> m a
 focus o = maybe failure return . preview o
