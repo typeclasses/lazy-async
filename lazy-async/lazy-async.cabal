@@ -47,3 +47,4 @@ test-suite test
     main-is:            test.hs
     default-extensions: OverloadedStrings
     default-extensions: TemplateHaskell
+    other-modules:      Test.Counter

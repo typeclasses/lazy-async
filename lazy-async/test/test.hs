@@ -2,14 +2,15 @@ module Main (main) where
 
 import LazyAsync
 
+import Test.Counter
+
 import Control.Concurrent (threadDelay)
 import Data.Bool          (not)
 import Data.Eq            (Eq)
 import Data.Foldable      (traverse_)
 import Data.Function      (($), (.))
 import Data.Maybe         (Maybe (Just), maybe)
-import Numeric.Natural    (Natural)
-import Prelude            (Integer, ($!), (+))
+import Prelude            (Integer)
 import System.Exit        (exitFailure)
 import System.IO          (IO)
 import Text.Show          (Show)
@@ -21,11 +22,9 @@ import Control.Applicative         (liftA2)
 import Control.Monad               (Monad (return, (>>=)), replicateM_, when)
 import Control.Monad.IO.Class      (MonadIO (..))
 import Control.Monad.Trans.Class   (MonadTrans (lift))
-import Control.Monad.Trans.Cont    (ContT (ContT), evalContT)
+import Control.Monad.Trans.Cont    (evalContT)
 import Control.Monad.Trans.Control (MonadBaseControl (restoreM))
 
-import Control.Concurrent.STM (TVar, atomically, newTVarIO, readTVar,
-                               readTVarIO, writeTVar)
 
 import Hedgehog (Group, MonadTest, Property, PropertyT, annotate, checkParallel,
                  discover, failure, property, withTests, (===))
@@ -146,34 +145,6 @@ throw' = throw
 
 example :: PropertyT IO () -> Property
 example = withTests 1 . property
-
-type Counter = TVar Natural
-
-newCounter :: MonadIO m => m Counter
-newCounter = liftIO $ newTVarIO 0
-
-tickCounter :: MonadIO m => Counter -> m Natural
-tickCounter counter = liftIO $ atomically $
-  do
-    x <- readTVar counter
-    writeTVar counter $! x + 1
-    return $ x + 1
-
-assertCount :: (MonadIO m, MonadTest m) => Counter -> Natural -> m ()
-assertCount counter expected = liftIO (readTVarIO counter) >>= (=== expected)
-
-type Tick m = m Natural
-
-expectTicks :: (MonadIO m, MonadTest m) =>
-    Natural -- ^ Expected number of times the 'Tick' action runs
-    -> ContT r m (Tick m)
-expectTicks n = ContT (\run ->
-  do
-    counter <- newCounter
-    x <- run (tickCounter counter)
-    assertCount counter n
-    return x
-  )
 
 focus :: (MonadTest m, Is k An_AffineFold) => Optic' k is s a -> s -> m a
 focus o = maybe failure return . preview o
