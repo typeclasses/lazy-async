@@ -9,7 +9,7 @@ module LazyAsync
     {- * Polling              -}  poll, Status (..), applyStatus,
     {- * Starting manually    -}  start, wait, waitCatch,
     {- * Transactions         -}  pollSTM, startSTM, waitCatchSTM,
-    {- * Memoizing IO actions -}  memoize,
+    {- * Memoization          -}  memoize,
     {- * IO specializations   -}  startWaitIO, startWaitCatchIO,
                                   startIO, pollIO, waitIO, waitCatchIO,
                                   lazyAsyncIO, memoizeIO
