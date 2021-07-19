@@ -70,8 +70,8 @@ prop_startWait = example $ evalContT $ do
     _ <- startWait la
     return ()
 
-prop_start_idemotent :: Property
-prop_start_idemotent = example $ evalContT $ do
+prop_start_idempotent :: Property
+prop_start_idempotent = example $ evalContT $ do
     annotate "'start' is idempotent"
     tick <- expectTicks 1
     la <- lazyAsyncCont tick
@@ -79,8 +79,8 @@ prop_start_idemotent = example $ evalContT $ do
     start la
     pause
 
-prop_startWait_idemotent :: Property
-prop_startWait_idemotent = example $ evalContT $ do
+prop_startWait_idempotent :: Property
+prop_startWait_idempotent = example $ evalContT $ do
     annotate "'startWait' is idemponent"
     tick <- expectTicks 1
     la <- lazyAsyncCont tick
