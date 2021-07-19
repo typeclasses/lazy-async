@@ -1,21 +1,18 @@
 {-# language Safe #-}
 
-module LazyAsync.Spawning
-  ( withLazyAsync, withLazyAsyncIO
-  , lazyAsyncCont, lazyAsyncContIO
-  ) where
+module LazyAsync.Spawning( lazyAsync, lazyAsyncIO ) where
 
 import Control.Applicative         ((*>))
 import Control.Concurrent.STM      (atomically, check)
 import Control.Concurrent.STM.TVar (TVar, newTVarIO, readTVar)
 import Control.Monad               ((>>=))
 import Control.Monad.Base          (MonadBase, liftBase)
+import Control.Monad.Trans.Cont    (ContT (ContT))
 import Control.Monad.Trans.Control (MonadBaseControl, StM)
 import Data.Bool                   (Bool (False))
 import LazyAsync.Async             (withAsync)
 import LazyAsync.LazyAsync         (LazyAsync (A1))
 import System.IO                   (IO)
-import Control.Monad.Trans.Cont
 
 {- | Creates a situation wherein:
 
@@ -24,6 +21,13 @@ import Control.Monad.Trans.Cont
   * The action shall run at most once
   * The action shall run only within the continuation (when the continuation ends, the action is stopped)
 -}
+lazyAsync :: MonadBaseControl IO m => m a -> ContT r m (LazyAsync (StM m a))
+lazyAsync action = ContT (withLazyAsync action)
+
+-- | Specialization of 'lazyAsync'
+lazyAsyncIO :: IO a -> ContT r IO (LazyAsync a)
+lazyAsyncIO action = ContT (withLazyAsyncIO action)
+
 withLazyAsync :: MonadBaseControl IO m =>
     m a -- ^ Action
     -> (LazyAsync (StM m a) -> m b) -- ^ Continuation
@@ -43,13 +47,3 @@ waitForTrue x = liftBase (atomically (readTVar x >>= check))
 
 newTVar :: MonadBase IO m => a -> m (TVar a)
 newTVar x = liftBase (newTVarIO x)
-
--- | 'withLazyAsync' wrapped in the 'Cont.ContT' constructor
---
-
-lazyAsyncCont :: MonadBaseControl IO m => m a -> ContT r m (LazyAsync (StM m a))
-lazyAsyncCont action = ContT (withLazyAsync action)
-
--- | Specialization of 'lazyAsyncCont'
-lazyAsyncContIO :: IO a -> ContT r IO (LazyAsync a)
-lazyAsyncContIO action = ContT (withLazyAsyncIO action)
