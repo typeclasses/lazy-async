@@ -3,13 +3,14 @@ module Main (main) where
 import LazyAsync
 
 import Test.Counter
+import Test.Optics
 
 import Control.Concurrent (threadDelay)
 import Data.Bool          (not)
 import Data.Eq            (Eq)
 import Data.Foldable      (traverse_)
 import Data.Function      (($), (.))
-import Data.Maybe         (Maybe (Just), maybe)
+import Data.Maybe         (Maybe (Just))
 import Prelude            (Integer)
 import System.Exit        (exitFailure)
 import System.IO          (IO)
@@ -25,16 +26,9 @@ import Control.Monad.Trans.Class   (MonadTrans (lift))
 import Control.Monad.Trans.Cont    (evalContT)
 import Control.Monad.Trans.Control (MonadBaseControl (restoreM))
 
-
 import Hedgehog (Group, MonadTest, Property, PropertyT, annotate, checkParallel,
-                 discover, failure, property, withTests, (===))
+                 discover, property, withTests, (===))
 
-import Optics.AffineFold (An_AffineFold, preview)
-import Optics.Optic      (Is, Optic')
-import Optics.TH         (makePrisms)
-
-$(makePrisms ''Status)
-$(makePrisms ''Outcome)
 
 main :: IO ()
 main = checkParallel group >>= \ok -> when (not ok) exitFailure
@@ -145,9 +139,6 @@ throw' = throw
 
 example :: PropertyT IO () -> Property
 example = withTests 1 . property
-
-focus :: (MonadTest m, Is k An_AffineFold) => Optic' k is s a -> s -> m a
-focus o = maybe failure return . preview o
 
 exceptionIs :: MonadTest m => (Exception e, Eq e, Show e) => e -> SomeException -> m ()
 exceptionIs a b = Just a === fromException b

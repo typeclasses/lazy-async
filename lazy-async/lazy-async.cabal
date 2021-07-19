@@ -48,3 +48,4 @@ test-suite test
     default-extensions: OverloadedStrings
     default-extensions: TemplateHaskell
     other-modules:      Test.Counter
+    other-modules:      Test.Optics
