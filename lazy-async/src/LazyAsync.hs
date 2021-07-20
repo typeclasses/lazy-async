@@ -37,7 +37,7 @@ module LazyAsync
                                   lazyAsyncIO, memoizeIO,
     {- * Re-exports           -}  ContT (ContT, runContT), evalContT,
                                   MonadIO (liftIO),
-                                  MonadBaseControl (restoreM)
+                                  MonadBaseControl
   ) where
 
 import LazyAsync.LazyAsync (LazyAsync, apply)
@@ -53,4 +53,4 @@ import LazyAsync.Waiting   (startWait, startWaitCatch, startWaitCatchIO,
 
 import Control.Monad.IO.Class      (MonadIO (liftIO))
 import Control.Monad.Trans.Cont    (ContT (ContT, runContT), evalContT)
-import Control.Monad.Trans.Control (MonadBaseControl (restoreM))
+import Control.Monad.Trans.Control (MonadBaseControl)

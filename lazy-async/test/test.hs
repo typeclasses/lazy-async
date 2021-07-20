@@ -49,7 +49,6 @@ prop_memoize_noAutoStart = example $ evalContT $ do
     tick <- expectTicks 0
     _ <- memoize tick
     pause
-    return ()
 
 prop_start :: Property
 prop_start = example $ evalContT $ do
@@ -64,8 +63,7 @@ prop_startWait = example $ evalContT $ do
     annotate "'startWait' prompts a 'LazyAsync' to run"
     tick <- expectTicks 1
     la <- lazyAsync tick
-    _ <- startWait la
-    return ()
+    lift $ startWait la >>= (=== 1)
 
 prop_start_idempotent :: Property
 prop_start_idempotent = example $ evalContT $ do
@@ -80,8 +78,7 @@ prop_startWait_idempotent = example $ evalContT $ do
     annotate "'startWait' is idemponent"
     tick <- expectTicks 1
     la <- lazyAsync tick
-    lift $ replicateM_ 2 $ startWait la >>= restoreM >>= (=== 1)
-    return ()
+    lift $ replicateM_ 2 $ startWait la >>= (=== 1)
 
 prop_memoize_idempotent :: Property
 prop_memoize_idempotent = example $ evalContT $ do
@@ -89,7 +86,6 @@ prop_memoize_idempotent = example $ evalContT $ do
     tick <- expectTicks 1
     tick' <- memoize tick
     lift $ replicateM_ 2 $ tick' >>= (=== 1)
-    return ()
 
 prop_startWaitCatch :: Property
 prop_startWaitCatch = example $ evalContT $ do
@@ -103,7 +99,6 @@ prop_startWaitCatch_idempotent = example $ evalContT $ do
     tick <- expectTicks 1
     la <- lazyAsync tick
     replicateM_ 2 $ startWaitCatch la
-    return ()
 
 prop_startWait_both :: Property
 prop_startWait_both = example $ evalContT $ do

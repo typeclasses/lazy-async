@@ -2,17 +2,18 @@
 
 module LazyAsync.Waiting where
 
-import Control.Applicative    ((*>))
-import Control.Concurrent.STM (STM, atomically, retry)
-import Control.Monad          (return, (>=>))
-import Control.Monad.Catch    (MonadThrow, throwM)
-import Control.Monad.IO.Class (MonadIO, liftIO)
-import LazyAsync.LazyAsync    (LazyAsync)
-import LazyAsync.Outcome      (Outcome (Failure, Success))
-import LazyAsync.Polling      (pollSTM)
-import LazyAsync.Starting     (start, startIO)
-import LazyAsync.Status       (Status (Done, Incomplete))
-import System.IO              (IO)
+import Control.Applicative         ((*>))
+import Control.Concurrent.STM      (STM, atomically, retry)
+import Control.Monad               (return, (>=>), (>>=))
+import Control.Monad.Catch         (MonadThrow, throwM)
+import Control.Monad.IO.Class      (MonadIO, liftIO)
+import Control.Monad.Trans.Control (MonadBaseControl, StM, restoreM)
+import LazyAsync.LazyAsync         (LazyAsync)
+import LazyAsync.Outcome           (Outcome (Failure, Success))
+import LazyAsync.Polling           (pollSTM)
+import LazyAsync.Starting          (start, startIO)
+import LazyAsync.Status            (Status (Done, Incomplete))
+import System.IO                   (IO)
 
 -- | Same as 'waitCatch', but in 'STM'
 waitCatchSTM :: LazyAsync a -> STM (Outcome a)
@@ -47,8 +48,8 @@ waitIO = waitCatch >=> outcomeSuccess
 -- If the action throws an exception, then the exception is re-thrown
 --
 -- @('startWait' x)@ is equivalent to @('start' x '*>' 'wait' x)@
-startWait :: MonadIO m => LazyAsync a -> m a
-startWait x = start x *> wait x
+startWait :: (MonadIO m, MonadBaseControl IO m) => LazyAsync (StM m a) -> m a
+startWait x = start x *> (wait x >>= restoreM)
 
 -- | Specialization of 'startWait'
 startWaitIO :: LazyAsync a -> IO a
