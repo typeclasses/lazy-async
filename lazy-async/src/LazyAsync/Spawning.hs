@@ -4,14 +4,20 @@ module LazyAsync.Spawning( lazyAsync, lazyAsyncIO ) where
 
 import Control.Applicative         ((*>))
 import Control.Concurrent.STM      (atomically, check)
-import Control.Concurrent.STM.TVar (TVar, newTVarIO, readTVar)
+import Control.Concurrent.STM.TVar (TVar, newTVarIO, readTVar, writeTVar)
+import Control.Exception           (SomeException)
 import Control.Monad               ((>>=))
 import Control.Monad.Base          (MonadBase, liftBase)
 import Control.Monad.Trans.Cont    (ContT (ContT))
 import Control.Monad.Trans.Control (MonadBaseControl, StM)
-import Data.Bool                   (Bool (False))
-import LazyAsync.Async             (withAsync)
+import Data.Bool                   (Bool (..))
+import Data.Either                 (Either (..))
+import Data.Functor                ((<&>))
+import Data.Maybe                  (Maybe (..))
+import LazyAsync.Async             (pollSTM, withAsync)
 import LazyAsync.LazyAsync         (LazyAsync (A1))
+import LazyAsync.Outcome           (Outcome (..))
+import LazyAsync.Status            (Status (..))
 import System.IO                   (IO)
 
 {- | Creates a situation wherein:
@@ -35,7 +41,7 @@ withLazyAsync :: MonadBaseControl IO m =>
     -> (LazyAsync (StM m a) -> m b) -- ^ Continuation
     -> m b
 withLazyAsync action continue =
-    newTVar False >>= \s -> withAsync (waitForTrue s *> action) (\a -> continue (A1 s a))
+    newTVar False >>= \s -> withAsync (waitForTrue s *> action) (\a -> continue (A1 (writeTVar s True) (pollSTM a <&> maybeEitherStatus)))
 
 -- | Specialization of 'withLazyAsync'
 withLazyAsyncIO ::
@@ -49,3 +55,11 @@ waitForTrue x = liftBase (atomically (readTVar x >>= check))
 
 newTVar :: MonadBase IO m => a -> m (TVar a)
 newTVar x = liftBase (newTVarIO x)
+
+maybeEitherStatus :: Maybe (Either SomeException a) -> Status a
+maybeEitherStatus Nothing  = Incomplete
+maybeEitherStatus (Just x) = Done (eitherDone x)
+
+eitherDone :: Either SomeException a -> Outcome a
+eitherDone (Left e)  = Failure e
+eitherDone (Right x) = Success x

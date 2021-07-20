@@ -2,22 +2,23 @@
 
 module LazyAsync.LazyAsync where
 
-import Control.Applicative         (Applicative (pure, (<*>)))
-import Control.Concurrent.STM.TVar (TVar)
-import Data.Bool                   (Bool)
-import Data.Functor                (Functor (fmap))
-import LazyAsync.Async             (Async)
+import Control.Applicative    (Applicative (pure, (<*>)))
+import Control.Concurrent.STM (STM)
+import Data.Functor           (Functor (fmap))
+import LazyAsync.Status       (Status)
 
 -- | An asynchronous action that does not start right away
 data LazyAsync a =
     A0 a -- ^ Triviality that gives rise to 'pure'
-  | A1 (TVar Bool) (Async a) -- ^ A single action
+  | A1 -- ^ A single action
+      (STM ()) -- ^ Start
+      (STM (Status a)) -- ^ Poll
   | forall x. Ap (LazyAsync (x -> a)) (LazyAsync x)
         -- ^ A complex of two 'LazyAsync's
 
 instance Functor LazyAsync where
     f `fmap` A0 x   = A0 (f x)
-    f `fmap` A1 s a = A1 s (fmap f a)
+    f `fmap` A1 s a = A1 s (fmap (fmap f) a)
     f `fmap` Ap x y = Ap (fmap (fmap f) x) y
 
 -- | '<*>' = 'apply'
