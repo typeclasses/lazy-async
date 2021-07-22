@@ -14,13 +14,20 @@ which does both. If the only thing you ever do with your 'LazyAsync's is
 'startWait' on them, then you may consider using 'memoize' instead, which does
 not require interacting with the 'LazyAsync' type at all.
 
-__About the monads__ — Most of the functions in this module are generalized
-using 'MonadBaseControl', which allows you to work in monads other than
-'System.IO.IO' (to see an example of this, see the test suite for this package,
-which creates 'LazyAsync's in Hedgehog's @PropertyT@ context). If you have any
-difficulty understanding these constraints, you may benefit from looking at the
-"IO specializations" section at the bottom of the module, in which all of the
-@m@ type variables are replaced with 'System.IO.IO'. -}
+__Working with ContT__ — Compose actions within the 'ContT' monadic context, and
+apply 'evalContT' at the top to run the continuation. If you do not want to work
+within 'ContT', then apply 'runContT' to the result of 'lazyAsync' to convert to
+explicit continuation-passing style.
+
+__Working with MonadBaseControl and StM__ — Most of the functions in this module
+are generalized using 'MonadBaseControl', which allows you to work in monads
+other than 'System.IO.IO' (to see an example of this, see the test suite for
+this package, which creates 'LazyAsync's in Hedgehog's @PropertyT@ context).
+'StM' is a type family which often "disappears" (that is, @StM m a ~ a@ for many
+@m@). If you have any difficulty understanding these constraints, you may
+benefit from looking at the "IO specializations" section at the bottom of the
+module, in which all of the @m@ type variables are replaced with 'System.IO.IO'.
+-}
 
 module LazyAsync
   ( {- * Asynchronous actions -}  LazyAsync,
