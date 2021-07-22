@@ -4,10 +4,11 @@ module LazyAsync.Waiting where
 
 import Control.Applicative         ((*>))
 import Control.Concurrent.STM      (STM, atomically, retry)
-import Control.Monad               (return, (>=>), (>>=))
+import Control.Monad               (fmap, return, (=<<), (>=>), (>>=))
+import Control.Monad.Base          (liftBase)
 import Control.Monad.Catch         (MonadThrow, throwM)
-import Control.Monad.IO.Class      (MonadIO, liftIO)
 import Control.Monad.Trans.Control (MonadBaseControl, StM, restoreM)
+import Data.Traversable            (sequenceA)
 import LazyAsync.LazyAsync         (LazyAsync)
 import LazyAsync.Outcome           (Outcome (Failure, Success))
 import LazyAsync.Polling           (pollSTM)
@@ -24,8 +25,8 @@ waitCatchSTM = pollSTM >=> statusOutcomeSTM
 -- If the action throws an exception, then the exception is returned
 --
 -- Does __not__ start the action
-waitCatch :: MonadIO m => LazyAsync a -> m (Outcome a)
-waitCatch la = liftIO (waitCatchIO la)
+waitCatch :: MonadBaseControl IO m => LazyAsync (StM m a) -> m (Outcome a)
+waitCatch x = sequenceA =<< liftBase (fmap (fmap restoreM) (waitCatchIO x))
 
 -- | Specialization of 'waitCatch'
 waitCatchIO :: LazyAsync a -> IO (Outcome a)
@@ -36,20 +37,20 @@ waitCatchIO la = atomically (waitCatchSTM la)
 -- If the action throws an exception, then the exception is re-thrown
 --
 -- Does __not__ start the action
-wait :: MonadIO m => LazyAsync a -> m a
-wait la = liftIO (waitIO la)
+wait :: (MonadBaseControl IO m) => LazyAsync (StM m a) -> m a
+wait x = liftBase (waitCatchIO x >>= outcomeSuccess) >>= restoreM
 
 -- | Specialization of 'wait'
 waitIO :: LazyAsync a -> IO a
-waitIO = waitCatch >=> outcomeSuccess
+waitIO = waitCatchIO >=> outcomeSuccess
 
 -- | Starts an asynchronous action, waits for it to complete, and returns its value
 --
 -- If the action throws an exception, then the exception is re-thrown
 --
 -- @('startWait' x)@ is equivalent to @('start' x '*>' 'wait' x)@
-startWait :: (MonadIO m, MonadBaseControl IO m) => LazyAsync (StM m a) -> m a
-startWait x = start x *> (wait x >>= restoreM)
+startWait :: MonadBaseControl IO m => LazyAsync (StM m a) -> m a
+startWait x = start x *> wait x
 
 -- | Specialization of 'startWait'
 startWaitIO :: LazyAsync a -> IO a
@@ -60,7 +61,7 @@ startWaitIO ao = startIO ao *> waitIO ao
 -- If the action throws an exception, then the exception is returned
 --
 -- @('startWaitCatch' x)@ is equivalent to @('start' x '*>' 'waitCatch' x)@
-startWaitCatch :: MonadIO m => LazyAsync a -> m (Outcome a)
+startWaitCatch :: MonadBaseControl IO m => LazyAsync (StM m a) -> m (Outcome a)
 startWaitCatch x = start x *> waitCatch x
 
 -- | Specialization of 'startWaitCatch'

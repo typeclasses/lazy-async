@@ -1,7 +1,6 @@
 module LazyAsync.Memoize where
 
 import Control.Monad               (fmap)
-import Control.Monad.IO.Class      (MonadIO)
 import Control.Monad.Trans.Cont    (ContT)
 import Control.Monad.Trans.Control (MonadBaseControl)
 import LazyAsync.Spawning          (lazyAsync, lazyAsyncIO)
@@ -14,7 +13,7 @@ import System.IO                   (IO)
   * The action shall run at most once
   * The action shall run only within the continuation (when the continuation ends, the action is stopped)
 -}
-memoize :: (MonadIO m, MonadBaseControl IO m) =>
+memoize :: (MonadBaseControl IO m) =>
     m a -- ^ Action
     -> ContT r m (m a) -- ^ Memoized action, in a continuation
 memoize action = fmap startWait (lazyAsync action)

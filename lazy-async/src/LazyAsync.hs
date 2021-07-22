@@ -15,12 +15,12 @@ which does both. If the only thing you ever do with your 'LazyAsync's is
 not require interacting with the 'LazyAsync' type at all.
 
 __About the monads__ — Most of the functions in this module are generalized
-using either 'MonadIO' or 'MonadBaseControl', which allows you to work in monads
-other than 'System.IO.IO' (to see an example of this, see the test suite for
-this package, which creates 'LazyAsync's in Hedgehog's @PropertyT@ context). If
-you have any difficulty understanding these constraints, you may benefit from
-looking at the "IO specializations" section at the bottom of the module, in
-which all of the @m@ type variables are replaced with 'System.IO.IO'. -}
+using 'MonadBaseControl', which allows you to work in monads other than
+'System.IO.IO' (to see an example of this, see the test suite for this package,
+which creates 'LazyAsync's in Hedgehog's @PropertyT@ context). If you have any
+difficulty understanding these constraints, you may benefit from looking at the
+"IO specializations" section at the bottom of the module, in which all of the
+@m@ type variables are replaced with 'System.IO.IO'. -}
 
 module LazyAsync
   ( {- * Asynchronous actions -}  LazyAsync,
@@ -36,7 +36,6 @@ module LazyAsync
                                   startIO, pollIO, waitIO, waitCatchIO,
                                   lazyAsyncIO, memoizeIO,
     {- * Re-exports           -}  ContT (ContT, runContT), evalContT,
-                                  MonadIO (liftIO),
                                   MonadBaseControl
   ) where
 
@@ -51,6 +50,5 @@ import LazyAsync.Waiting   (startWait, startWaitCatch, startWaitCatchIO,
                             startWaitIO, wait, waitCatch, waitCatchIO,
                             waitCatchSTM, waitIO)
 
-import Control.Monad.IO.Class      (MonadIO (liftIO))
 import Control.Monad.Trans.Cont    (ContT (ContT, runContT), evalContT)
 import Control.Monad.Trans.Control (MonadBaseControl)

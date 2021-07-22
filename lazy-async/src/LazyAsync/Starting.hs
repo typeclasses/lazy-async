@@ -5,14 +5,14 @@ module LazyAsync.Starting where
 import Control.Applicative    ((*>))
 import Control.Concurrent.STM (STM, atomically)
 import Control.Monad          (return)
-import Control.Monad.IO.Class (MonadIO, liftIO)
+import Control.Monad.Base     (MonadBase, liftBase)
 import LazyAsync.LazyAsync    (LazyAsync (A0, A1, Ap))
 import System.IO              (IO)
 
 -- | Starts an asynchronous action, if it has not already been started
-start :: MonadIO m => LazyAsync a -> m ()
+start :: MonadBase IO m => LazyAsync a -> m ()
 start A0{}     = return ()
-start (A1 s _) = liftIO (atomically s)
+start (A1 s _) = liftBase (atomically s)
 start (Ap x y) = start x *> start y
 
 -- | Specialization of 'start'
