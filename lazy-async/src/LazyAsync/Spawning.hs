@@ -6,6 +6,7 @@ import Control.Applicative         ((*>))
 import Control.Concurrent.STM      (atomically, check)
 import Control.Concurrent.STM.TVar (TVar, newTVarIO, readTVar, writeTVar)
 import Control.Exception           (SomeException)
+import Control.Monad.IO.Class
 import Control.Monad               ((>>=))
 import Control.Monad.Base          (MonadBase, liftBase)
 import Control.Monad.Trans.Cont    (ContT (ContT))
@@ -50,11 +51,11 @@ withLazyAsyncIO ::
     -> IO b
 withLazyAsyncIO = withLazyAsync
 
-waitForTrue :: MonadBase IO m => TVar Bool -> m ()
-waitForTrue x = liftBase (atomically (readTVar x >>= check))
+waitForTrue :: (MonadBase base m, MonadIO base) => TVar Bool -> m ()
+waitForTrue x = liftBase (liftIO (atomically (readTVar x >>= check)))
 
-newTVar :: MonadBase IO m => a -> m (TVar a)
-newTVar x = liftBase (newTVarIO x)
+newTVar :: (MonadBase base m, MonadIO base) => a -> m (TVar a)
+newTVar x = liftBase (liftIO (newTVarIO x))
 
 maybeEitherStatus :: Maybe (Either SomeException a) -> Status a
 maybeEitherStatus Nothing  = Incomplete
