@@ -35,7 +35,8 @@ module LazyAsync
     {- * IO specializations   -}  startWaitIO, startWaitCatchIO,
                                   startIO, pollIO, waitIO, waitCatchIO,
                                   lazyAsyncIO, memoizeIO,
-    {- * Re-exports           -}  ContT (ContT, runContT), evalContT,
+    {- * Re-exports           -}  {- $re-exports -}
+                                  ContT (ContT, runContT), evalContT,
                                   MonadBaseControl (liftBaseWith, restoreM, StM),
                                   MonadBase (liftBase),
                                   MonadIO (liftIO)
@@ -54,3 +55,33 @@ import Control.Monad.Base
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Cont
 import Control.Monad.Trans.Control
+
+{- $re-exports
+
+Some key monad lifting concepts from other
+packages are re-exported from this module.
+
+__base__ ("Control.Monad.IO.Class")
+
+  * 'MonadIO'
+  * 'liftIO'
+
+__transformers__  ("Control.Monad.Trans.Cont")
+
+  * 'ContT'
+  * 'runContT'
+  * 'evalContT'
+
+__monad-base__ ("Control.Monad.Base")
+
+  * 'MonadBase'
+  * 'liftBase'
+
+__monad-control__  ("Control.Monad.Trans.Control")
+
+  * 'MonadBaseControl'
+  * 'liftBaseWith'
+  * 'restoreM'
+  * 'StM'
+
+-}
