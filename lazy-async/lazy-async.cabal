@@ -45,6 +45,7 @@ test-suite test
     hs-source-dirs:     test
     type:               exitcode-stdio-1.0
     main-is:            test.hs
+    default-extensions: BlockArguments
     default-extensions: OverloadedStrings
     default-extensions: TemplateHaskell
     other-modules:      Test.Counter
