@@ -2,7 +2,8 @@
 
 module LazyAsync.Status where
 
-import Control.Applicative (Applicative (pure, (<*>)))
+import Control.Applicative (Alternative (empty, (<|>)),
+                            Applicative (pure, (<*>)))
 import Data.Foldable       (Foldable (foldr))
 import Data.Functor        (Functor (fmap))
 import Data.Traversable    (Traversable (sequenceA))
@@ -29,6 +30,11 @@ instance Applicative Status where
     pure x = Done (pure x)
     (<*>) = applyStatus
 
+-- | '<|>' = 'chooseStatus'
+instance Alternative Status where
+    empty = Done empty
+    (<|>) = chooseStatus
+
 instance Foldable Status where
     foldr _ z Incomplete = z
     foldr f z (Done o)   = foldr f z o
@@ -49,3 +55,19 @@ Done (Failure e) `applyStatus` _                = Done (Failure e)
 _                `applyStatus` Done (Failure e) = Done (Failure e)
 Done (Success f) `applyStatus` Done (Success x) = Done (Success (f x))
 _                `applyStatus` _                = Incomplete
+
+{- | Returns the leftmost 'Success', if there is one
+
+Otherwise, if any part of a complex is 'Incomplete', then the complex
+evaluates to 'Incomplete'
+
+Only when all parts have completed as 'Failure' does the whole fail -}
+chooseStatus :: Status a -> Status a -> Status a
+chooseStatus x y =
+    case x of
+        Done Success{} -> x
+        Done Failure{} -> y
+        Incomplete ->
+            case y of
+                Done Failure{} -> x
+                _              -> y
