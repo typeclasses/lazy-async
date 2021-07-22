@@ -2,8 +2,9 @@
 
 module LazyAsync.Outcome where
 
-import Control.Applicative (Applicative (pure, (<*>)))
-import Control.Exception   (SomeException)
+import Control.Applicative (Alternative (empty, (<|>)),
+                            Applicative (pure, (<*>)))
+import Control.Exception   (Exception, SomeException, toException)
 import Control.Monad       (Functor (fmap))
 import Data.Foldable       (Foldable (foldr))
 import Data.Traversable    (Traversable (sequenceA))
@@ -26,6 +27,11 @@ instance Applicative Outcome where
     pure = Success
     (<*>) = applyOutcome
 
+-- | '<|>' = 'chooseOutcome'
+instance Alternative Outcome where
+    empty = Failure (toException NoAlternative)
+    (<|>) = chooseOutcome
+
 instance Foldable Outcome where
     foldr _ z (Failure _) = z
     foldr f z (Success x) = f x z
@@ -43,3 +49,15 @@ applyOutcome fo ao =
             case ao of
                 Failure e -> Failure e
                 Success x -> Success (f x)
+
+-- | Behaves the same as '<|>' for 'Data.Either.Either', returning the leftmost 'Success'
+chooseOutcome :: Outcome a -> Outcome a -> Outcome a
+chooseOutcome x y =
+    case x of
+        Failure _ -> y
+        _         -> x
+
+data NoAlternative = NoAlternative
+    deriving Show
+
+instance Exception NoAlternative
