@@ -3,12 +3,14 @@
 module LazyAsync.Status where
 
 import Control.Applicative (Applicative (pure, (<*>)))
+import Data.Foldable       (Foldable (foldr))
 import Data.Functor        (Functor (fmap))
+import Data.Traversable    (Traversable (sequenceA))
 import LazyAsync.Outcome   (Outcome (Failure, Success))
 import Text.Show           (Show)
 
--- | Whether a 'LazyAsync.LazyAsync' action
--- has completed yet, and, if so, what it produced
+-- | Whether a 'LazyAsync.LazyAsync' action has
+-- completed yet, and, if so, what it produced
 --
 -- Obtained using 'LazyAsync.poll'
 data Status a =
@@ -27,6 +29,13 @@ instance Applicative Status where
     pure x = Done (pure x)
     (<*>) = applyStatus
 
+instance Foldable Status where
+    foldr _ z Incomplete = z
+    foldr f z (Done o)   = foldr f z o
+
+instance Traversable Status where
+    sequenceA Incomplete = pure Incomplete
+    sequenceA (Done o)   = fmap Done (sequenceA o)
 
 {- | Combines two 'LazyAsync.LazyAsync' statuses to produce a summary
 of the status of the overall complex
