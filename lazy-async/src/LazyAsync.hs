@@ -36,19 +36,19 @@ module LazyAsync
                                   startIO, pollIO, waitIO, waitCatchIO,
                                   lazyAsyncIO, memoizeIO,
     {- * Re-exports           -}  ContT (ContT, runContT), evalContT,
-                                  MonadBaseControl
+                                  MonadBaseControl (liftBaseWith, restoreM, StM),
+                                  MonadBase (liftBase)
   ) where
 
-import LazyAsync.LazyAsync (LazyAsync, apply)
-import LazyAsync.Memoize   (memoize, memoizeIO)
-import LazyAsync.Outcome   (Outcome (..), applyOutcome)
-import LazyAsync.Polling   (poll, pollIO, pollSTM)
-import LazyAsync.Spawning  (lazyAsync, lazyAsyncIO)
-import LazyAsync.Starting  (start, startIO, startSTM)
-import LazyAsync.Status    (Status (..), applyStatus)
-import LazyAsync.Waiting   (startWait, startWaitCatch, startWaitCatchIO,
-                            startWaitIO, wait, waitCatch, waitCatchIO,
-                            waitCatchSTM, waitIO)
+import LazyAsync.LazyAsync
+import LazyAsync.Memoize
+import LazyAsync.Outcome
+import LazyAsync.Polling
+import LazyAsync.Spawning
+import LazyAsync.Starting
+import LazyAsync.Status
+import LazyAsync.Waiting
 
-import Control.Monad.Trans.Cont    (ContT (ContT, runContT), evalContT)
-import Control.Monad.Trans.Control (MonadBaseControl)
+import Control.Monad.Base
+import Control.Monad.Trans.Cont
+import Control.Monad.Trans.Control
