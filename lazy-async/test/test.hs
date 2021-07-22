@@ -6,22 +6,18 @@ import Test.Counter
 import Test.Exceptions
 import Test.Optics
 
-import Control.Concurrent   (threadDelay)
-import Data.Bool            (not)
-import Data.Foldable        (traverse_)
-import Data.Function        (($), (.))
-import Data.Functor.Compose
-import Numeric.Natural
-import System.Exit          (exitFailure)
-import System.IO            (IO)
+import Control.Concurrent (threadDelay)
+import Data.Bool          (not)
+import Data.Foldable      (traverse_)
+import Data.Function      (($), (.))
+import System.Exit        (exitFailure)
+import System.IO          (IO)
 
 import Control.Exception (ArithException (DivideByZero))
 
-import Control.Applicative         (liftA2)
-import Control.Monad               (Monad (return, (>>=)), replicateM_, when)
-import Control.Monad.Base          (MonadBase, liftBase)
-import Control.Monad.Trans.Class   (MonadTrans (lift))
-import Control.Monad.Trans.Control
+import Control.Applicative       (liftA2)
+import Control.Monad             (Monad (return, (>>=)), replicateM_, when)
+import Control.Monad.Trans.Class (MonadTrans (lift))
 
 import Hedgehog (Group, Property, PropertyT, annotate, checkParallel, discover,
                  property, withTests, (===))
@@ -104,31 +100,31 @@ prop_startWaitCatch_idempotent = example $ evalContT $ do
     la <- lazyAsync tick
     replicateM_ 2 $ lift (startWaitCatch la)
 
-{-
-
 prop_startWait_both :: Property
 prop_startWait_both = example $ evalContT $ do
     annotate "'startWait' on a complex runs both actions"
     tick <- expectTicks 2
-    la1 <- lazyAsync tick
-    la2 <- lazyAsync tick
-    _ <- startWaitCatch (getCompose (liftA2 (,) (Compose la1) (Compose la2)))
-    return ()
+    liftIO $ evalContT $
+      do
+        la1 <- lazyAsync tick
+        la2 <- lazyAsync tick
+        _ <- lift $ startWaitCatch (liftA2 (,) la1 la2)
+        return ()
 
 prop_complexOnce :: Property
 prop_complexOnce = example $ evalContT $ do
     annotate "actions included in multiple complexes still can only run once"
     tick <- expectTicks 3
 
-    la1 <- lazyAsync tick
-    la2 <- lazyAsync tick
-    la3 <- lazyAsync tick
+    liftIO $ evalContT $
+      do
+        la1 <- lazyAsync tick
+        la2 <- lazyAsync tick
+        la3 <- lazyAsync tick
 
-    let a = liftA2 (,) la1 la2
-        b = liftA2 (,) la3 la2
-        c = liftA2 (,) la1 la3
+        let a = liftA2 (,) la1 la2
+            b = liftA2 (,) la3 la2
+            c = liftA2 (,) la1 la3
 
-    traverse_ start [a, b, c]
-    lift (traverse_ wait [a, b, c])
-
--}
+        traverse_ start [a, b, c]
+        lift (traverse_ wait [a, b, c])
