@@ -1,4 +1,4 @@
-module Test.Optics (focus, _Incomplete, _Failure) where
+module Test.Optics (focus, _Incomplete, _Failure, _Success, _Done) where
 
 import Control.Monad     (Monad (return))
 import Data.Function     ((.))

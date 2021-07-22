@@ -10,13 +10,14 @@ import Control.Concurrent (threadDelay)
 import Data.Bool          (not)
 import Data.Foldable      (traverse_)
 import Data.Function      (($), (.))
+import Prelude            ((+))
 import System.Exit        (exitFailure)
 import System.IO          (IO)
 
 import Control.Exception (ArithException (DivideByZero))
 
 import Control.Applicative       (liftA2)
-import Control.Monad             (Monad (return, (>>=)), replicateM_, when)
+import Control.Monad             (Monad ((>>=)), replicateM_, when)
 import Control.Monad.Trans.Class (MonadTrans (lift))
 
 import Hedgehog (Group, Property, PropertyT, annotate, checkParallel, discover,
@@ -104,20 +105,20 @@ prop_startWait_both :: Property
 prop_startWait_both = example $ evalContT $ do
     annotate "'startWait' on a complex runs both actions"
     tick <- expectTicks 2
-    liftIO $ evalContT $
-      do
+
+    outcome <- liftIO $ evalContT $ do
         la1 <- lazyAsync tick
         la2 <- lazyAsync tick
-        _ <- lift $ startWaitCatch (liftA2 (,) la1 la2)
-        return ()
+        lift $ startWaitCatch (liftA2 (+) la1 la2)
+
+    lift $ focus _Success outcome >>= (=== 3)
 
 prop_complexOnce :: Property
 prop_complexOnce = example $ evalContT $ do
     annotate "actions included in multiple complexes still can only run once"
     tick <- expectTicks 3
 
-    liftIO $ evalContT $
-      do
+    liftIO $ evalContT $ do
         la1 <- lazyAsync tick
         la2 <- lazyAsync tick
         la3 <- lazyAsync tick
