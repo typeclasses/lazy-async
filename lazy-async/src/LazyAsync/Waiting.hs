@@ -43,7 +43,7 @@ wait x = liftBase (liftIO (waitCatchIO x) >>= (\o -> liftIO (outcomeSuccess o)))
 
 -- | Specialization of 'wait'
 waitIO :: LazyAsync a -> IO a
-waitIO = waitCatchIO >=> outcomeSuccess
+waitIO = wait
 
 -- | Starts an asynchronous action, waits for it to complete, and returns its value
 --
