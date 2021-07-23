@@ -16,7 +16,7 @@ import Data.Either                 (Either (..))
 import Data.Functor                ((<&>))
 import Data.Maybe                  (Maybe (..))
 import LazyAsync.Async             (pollSTM, withAsync)
-import LazyAsync.LazyAsync         (LazyAsync (A1))
+import LazyAsync.LazyAsync         (LazyAsync (A1), StartPoll (StartPoll))
 import LazyAsync.Outcome           (Outcome (..))
 import LazyAsync.Status            (Status (..))
 import System.IO                   (IO)
@@ -36,7 +36,7 @@ lazyAsync action = ContT (withLazyAsync action)
 withLazyAsync :: MonadBaseControl IO m =>
     m a -> (LazyAsync (StM m a) -> m b) -> m b
 withLazyAsync action continue =
-    newTVar False >>= \s -> withAsync (waitForTrue s *> action) (\a -> continue (A1 (writeTVar s True) (pollSTM a <&> maybeEitherStatus)))
+    newTVar False >>= \s -> withAsync (waitForTrue s *> action) (\a -> continue (A1 (StartPoll (writeTVar s True) (pollSTM a <&> maybeEitherStatus))))
 
 -- | Akin to 'lazyAsync'
 withLazyAsyncIO :: IO a -> (LazyAsync a -> IO b) -> IO b

@@ -11,17 +11,22 @@ import LazyAsync.Status       (Status)
 -- | An asynchronous action that does not start right away
 data LazyAsync a =
     A0 a -- ^ Triviality that gives rise to 'pure'
-  | A1 -- ^ A single action
-      (STM ()) -- ^ Start
-      (STM (Status a)) -- ^ Poll
+  | A1 (StartPoll a) -- ^ A single action
   | forall x. Ap (LazyAsync (x -> a)) (LazyAsync x)
         -- ^ A complex of two 'LazyAsync's
   | Choose (LazyAsync a) (LazyAsync a)
   | Empty
 
+data StartPoll a = StartPoll
+    (STM ()) -- ^ Start
+    (STM (Status a)) -- ^ Poll
+
+instance Functor StartPoll where
+    fmap f (StartPoll x y) = StartPoll x (fmap (fmap f) y)
+
 instance Functor LazyAsync where
     f `fmap` A0 x       = A0 (f x)
-    f `fmap` A1 s a     = A1 s (fmap (fmap f) a)
+    f `fmap` A1 x       = A1 (fmap f x)
     f `fmap` Ap x y     = Ap (fmap (fmap f) x) y
     f `fmap` Choose x y = Choose (fmap f x) (fmap f y)
     _ `fmap` Empty      = Empty
