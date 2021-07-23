@@ -67,7 +67,7 @@ startWaitCatch x = start x *> waitCatch x
 
 -- | Specialization of 'startWaitCatch'
 startWaitCatchIO :: LazyAsync a -> IO (Outcome a)
-startWaitCatchIO ao = start ao *> waitCatch ao
+startWaitCatchIO = startWaitCatch
 
 statusOutcomeSTM :: Status a -> STM (Outcome a)
 statusOutcomeSTM Incomplete = retry
