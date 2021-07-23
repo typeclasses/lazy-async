@@ -6,9 +6,11 @@ version: 0
 common language
     default-language:   Haskell2010
     ghc-options:        -Wall
+    default-extensions: DeriveFunctor
     default-extensions: ExistentialQuantification
     default-extensions: FlexibleContexts
     default-extensions: NoImplicitPrelude
+    default-extensions: StandaloneDeriving
 
 common dependencies
     build-depends:      base              ^>= 4.14   || ^>= 4.15

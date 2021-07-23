@@ -9,7 +9,7 @@ import Control.Monad.Base          (liftBase)
 import Control.Monad.IO.Class      (MonadIO, liftIO)
 import Control.Monad.Trans.Control (MonadBaseControl, StM, restoreM)
 import Data.Traversable            (sequenceA)
-import LazyAsync.LazyAsync         (LazyAsync (..), StartPoll (StartPoll))
+import LazyAsync.LazyAsync         (Apply (..), LazyAsync (..), StartPoll (..))
 import LazyAsync.Status            (Status)
 import System.IO                   (IO)
 
@@ -27,6 +27,6 @@ pollIO la = atomically (pollSTM la)
 pollSTM :: LazyAsync a -> STM (Status a)
 pollSTM (Pure x)             = return (pure x)
 pollSTM (A1 (StartPoll _ a)) = a
-pollSTM (Ap x y)             = liftA2 (<*>) (pollSTM x) (pollSTM y)
+pollSTM (Ap (Apply x y))     = liftA2 (<*>) (pollSTM x) (pollSTM y)
 pollSTM (Choose x y)         = liftA2 (<|>) (pollSTM x) (pollSTM y)
 pollSTM Empty                = return empty

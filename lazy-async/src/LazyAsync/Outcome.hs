@@ -5,8 +5,8 @@ module LazyAsync.Outcome where
 import Control.Applicative (Alternative (empty, (<|>)),
                             Applicative (pure, (<*>)))
 import Control.Exception   (Exception, SomeException, toException)
-import Control.Monad       (Functor (fmap))
 import Data.Foldable       (Foldable (foldr))
+import Data.Functor        (Functor, fmap)
 import Data.Traversable    (Traversable (sequenceA))
 import Text.Show           (Show)
 
@@ -16,11 +16,7 @@ import Text.Show           (Show)
 data Outcome a =
     Failure SomeException -- ^ The 'LazyAsync.LazyAsync.LazyAsync' action threw an exception
   | Success a -- ^ The 'LazyAsync.LazyAsync.LazyAsync' action completed normally
-    deriving Show
-
-instance Functor Outcome where
-    _ `fmap` Failure e = Failure e
-    f `fmap` Success x = Success (f x)
+    deriving (Functor, Show)
 
 -- | '<*>' = 'applyOutcome'
 instance Applicative Outcome where

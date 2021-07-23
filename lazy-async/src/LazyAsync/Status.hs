@@ -5,7 +5,7 @@ module LazyAsync.Status where
 import Control.Applicative (Alternative (empty, (<|>)),
                             Applicative (pure, (<*>)))
 import Data.Foldable       (Foldable (foldr))
-import Data.Functor        (Functor (fmap))
+import Data.Functor        (Functor, fmap)
 import Data.Traversable    (Traversable (sequenceA))
 import LazyAsync.Outcome   (Outcome (Failure, Success))
 import Text.Show           (Show)
@@ -19,11 +19,7 @@ data Status a =
                --   (and might not have even started yet)
   | Done (Outcome a) -- ^ The 'LazyAsync.LazyAsync' action has ended, either
                      --   by returning normally or by throwing an exception
-    deriving Show
-
-instance Functor Status where
-    _ `fmap` Incomplete = Incomplete
-    f `fmap` Done x     = Done (f `fmap` x)
+    deriving (Functor, Show)
 
 -- | '<*>' = 'applyStatus'
 instance Applicative Status where
