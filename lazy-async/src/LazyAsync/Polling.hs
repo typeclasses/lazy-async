@@ -20,11 +20,11 @@ import System.IO                   (IO)
 poll :: (MonadBaseControl base m, MonadIO base) => LazyAsync (StM m a) -> m (Status a)
 poll la = sequenceA =<< liftBase (fmap (fmap restoreM) (liftIO (pollIO la)))
 
--- | Specialization of 'poll'
+-- | Akin to 'poll'
 pollIO :: LazyAsync a -> IO (Status a)
 pollIO la = atomically (pollSTM la)
 
--- | Same as 'poll', but in 'STM'
+-- | Akin to 'poll'
 pollSTM :: LazyAsync a -> STM (Status a)
 pollSTM (A0 x)   = return (pure x)
 pollSTM (A1 _ a) = a

@@ -16,11 +16,11 @@ start A0{}     = return ()
 start (A1 s _) = liftBase (liftIO (atomically s))
 start (Ap x y) = start x *> start y
 
--- | Specialization of 'start'
+-- | Akin to 'start'
 startIO :: LazyAsync a -> IO ()
 startIO = start
 
--- | Same as 'start', but in 'STM'
+-- | Akin to 'start'
 startSTM :: LazyAsync a -> STM ()
 startSTM A0{}     = return ()
 startSTM (A1 s _) = s

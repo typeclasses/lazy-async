@@ -1,7 +1,7 @@
 module LazyAsync.Memoize where
 
 import Control.Monad               (fmap)
-import Control.Monad.Trans.Cont    (ContT)
+import Control.Monad.Trans.Cont    (ContT, runContT)
 import Control.Monad.Trans.Control (MonadBaseControl)
 import LazyAsync.Spawning          (lazyAsync)
 import LazyAsync.Waiting           (startWait)
@@ -18,6 +18,6 @@ memoize :: (MonadBaseControl IO m) =>
     -> ContT r m (m a) -- ^ Memoized action, in a continuation
 memoize action = fmap startWait (lazyAsync action)
 
--- | Specialization of 'memoize'
-memoizeIO :: IO a -> ContT r IO (IO a)
-memoizeIO = memoize
+-- | Akin to 'memoize'
+withMemoizedIO :: IO a -> (IO a -> IO b) -> IO b
+withMemoizedIO action = runContT (memoize action)

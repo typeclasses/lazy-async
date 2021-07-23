@@ -17,7 +17,7 @@ import LazyAsync.Status            (Status (Done, Incomplete))
 import System.IO                   (IO)
 import Control.Monad.IO.Class
 
--- | Same as 'waitCatch', but in 'STM'
+-- | Akin to 'waitCatch'
 waitCatchSTM :: LazyAsync a -> STM (Outcome a)
 waitCatchSTM = pollSTM >=> statusOutcomeSTM
 
@@ -29,7 +29,7 @@ waitCatchSTM = pollSTM >=> statusOutcomeSTM
 waitCatch :: (MonadBaseControl base m, MonadIO base) => LazyAsync (StM m a) -> m (Outcome a)
 waitCatch x = sequenceA =<< liftBase (fmap (fmap restoreM) (liftIO (waitCatchIO x)))
 
--- | Specialization of 'waitCatch'
+-- | Akin to 'waitCatch'
 waitCatchIO :: LazyAsync a -> IO (Outcome a)
 waitCatchIO la = atomically (waitCatchSTM la)
 
@@ -41,7 +41,7 @@ waitCatchIO la = atomically (waitCatchSTM la)
 wait :: (MonadBaseControl base m, MonadIO base) => LazyAsync (StM m a) -> m a
 wait x = liftBase (liftIO (waitCatchIO x) >>= (\o -> liftIO (outcomeSuccess o))) >>= restoreM
 
--- | Specialization of 'wait'
+-- | Akin to 'wait'
 waitIO :: LazyAsync a -> IO a
 waitIO = wait
 
@@ -53,7 +53,7 @@ waitIO = wait
 startWait :: (MonadBaseControl base m, MonadIO base) => LazyAsync (StM m a) -> m a
 startWait x = start x *> wait x
 
--- | Specialization of 'startWait'
+-- | Akin to 'startWait'
 startWaitIO :: LazyAsync a -> IO a
 startWaitIO = startWait
 
@@ -65,7 +65,7 @@ startWaitIO = startWait
 startWaitCatch :: (MonadBaseControl base m, MonadIO base) => LazyAsync (StM m a) -> m (Outcome a)
 startWaitCatch x = start x *> waitCatch x
 
--- | Specialization of 'startWaitCatch'
+-- | Akin to 'startWaitCatch'
 startWaitCatchIO :: LazyAsync a -> IO (Outcome a)
 startWaitCatchIO = startWaitCatch
 

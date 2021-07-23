@@ -1,14 +1,14 @@
 {-# language Safe #-}
 
-module LazyAsync.Spawning( lazyAsync, lazyAsyncIO ) where
+module LazyAsync.Spawning ( lazyAsync, withLazyAsyncIO ) where
 
 import Control.Applicative         ((*>))
 import Control.Concurrent.STM      (atomically, check)
 import Control.Concurrent.STM.TVar (TVar, newTVarIO, readTVar, writeTVar)
 import Control.Exception           (SomeException)
-import Control.Monad.IO.Class
 import Control.Monad               ((>>=))
 import Control.Monad.Base          (MonadBase, liftBase)
+import Control.Monad.IO.Class      (MonadIO, liftIO)
 import Control.Monad.Trans.Cont    (ContT (ContT))
 import Control.Monad.Trans.Control (MonadBaseControl, StM)
 import Data.Bool                   (Bool (..))
@@ -33,22 +33,13 @@ lazyAsync :: MonadBaseControl IO m =>
     -> ContT r m (LazyAsync (StM m a))
 lazyAsync action = ContT (withLazyAsync action)
 
--- | Specialization of 'lazyAsync'
-lazyAsyncIO :: IO a -> ContT r IO (LazyAsync a)
-lazyAsyncIO action = ContT (withLazyAsyncIO action)
-
 withLazyAsync :: MonadBaseControl IO m =>
-    m a -- ^ Action
-    -> (LazyAsync (StM m a) -> m b) -- ^ Continuation
-    -> m b
+    m a -> (LazyAsync (StM m a) -> m b) -> m b
 withLazyAsync action continue =
     newTVar False >>= \s -> withAsync (waitForTrue s *> action) (\a -> continue (A1 (writeTVar s True) (pollSTM a <&> maybeEitherStatus)))
 
--- | Specialization of 'withLazyAsync'
-withLazyAsyncIO ::
-    IO a  -- ^ Action
-    -> (LazyAsync a -> IO b) -- ^ Continuation
-    -> IO b
+-- | Akin to 'lazyAsync'
+withLazyAsyncIO :: IO a -> (LazyAsync a -> IO b) -> IO b
 withLazyAsyncIO = withLazyAsync
 
 waitForTrue :: (MonadBase base m, MonadIO base) => TVar Bool -> m ()
