@@ -3,8 +3,8 @@ module LazyAsync.Memoize where
 import Control.Monad               (fmap)
 import Control.Monad.Trans.Cont    (ContT)
 import Control.Monad.Trans.Control (MonadBaseControl)
-import LazyAsync.Spawning          (lazyAsync, lazyAsyncIO)
-import LazyAsync.Waiting           (startWait, startWaitIO)
+import LazyAsync.Spawning          (lazyAsync)
+import LazyAsync.Waiting           (startWait)
 import System.IO                   (IO)
 
 {- | Creates a situation wherein:
@@ -20,4 +20,4 @@ memoize action = fmap startWait (lazyAsync action)
 
 -- | Specialization of 'memoize'
 memoizeIO :: IO a -> ContT r IO (IO a)
-memoizeIO action = fmap startWaitIO (lazyAsyncIO action)
+memoizeIO = memoize
