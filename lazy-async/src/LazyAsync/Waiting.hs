@@ -12,7 +12,7 @@ import Data.Traversable            (sequenceA)
 import LazyAsync.LazyAsync         (LazyAsync)
 import LazyAsync.Outcome           (Outcome (Failure, Success))
 import LazyAsync.Polling           (pollSTM)
-import LazyAsync.Starting          (start, startIO)
+import LazyAsync.Starting          (start)
 import LazyAsync.Status            (Status (Done, Incomplete))
 import System.IO                   (IO)
 import Control.Monad.IO.Class
@@ -55,7 +55,7 @@ startWait x = start x *> wait x
 
 -- | Specialization of 'startWait'
 startWaitIO :: LazyAsync a -> IO a
-startWaitIO ao = startIO ao *> waitIO ao
+startWaitIO = startWait
 
 -- | Starts an asynchronous action, waits for it to complete, and returns its value
 --
