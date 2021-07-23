@@ -10,14 +10,14 @@ import Control.Concurrent (threadDelay)
 import Data.Bool          (not)
 import Data.Foldable      (traverse_)
 import Data.Function      ((.))
-import Prelude            ((+))
+import Prelude            ((+), Integer)
 import System.Exit        (exitFailure)
 import System.IO          (IO)
 
 import Control.Exception (ArithException (DivideByZero))
 
-import Control.Applicative       (liftA2)
-import Control.Monad             (Monad ((>>=)), replicateM_, when)
+import Control.Applicative       (liftA2, (<|>))
+import Control.Monad             ((>>=), replicateM_, when, return)
 import Control.Monad.Trans.Class (MonadTrans (lift))
 
 import Hedgehog (Group, Property, PropertyT, annotate, checkParallel, discover,
@@ -107,9 +107,9 @@ prop_startWaitCatch_idempotent = contExample do
     la <- lazyAsync tick
     replicateM_ 2 (lift (startWaitCatch la))
 
-prop_startWait_both :: Property
-prop_startWait_both = contExample do
-    annotate "'startWait' on a complex runs both actions"
+prop_apply_startWait_both :: Property
+prop_apply_startWait_both = contExample do
+    annotate "'startWait' on an applicative complex runs both actions"
     tick <- expectTicks 2
 
     outcome <- contIO do
@@ -120,9 +120,9 @@ prop_startWait_both = contExample do
 
     lift (focus _Success outcome >>= (=== 3))
 
-prop_complexOnce :: Property
-prop_complexOnce = contExample do
-    annotate "actions included in multiple complexes still can only run once"
+prop_apply_once :: Property
+prop_apply_once = contExample do
+    annotate "actions included in multiple applicative complexes still can only run once"
     tick <- expectTicks 3
 
     contIO do
@@ -136,3 +136,15 @@ prop_complexOnce = contExample do
 
         traverse_ start complexes
         lift (traverse_ wait complexes)
+
+prop_choose :: Property
+prop_choose = contExample do
+    la1 <- lazyAsync (return (5 :: Integer))
+    la2 <- lazyAsync (throw' DivideByZero)
+
+    let complex1 = la1 <|> la2
+        complex2 = la2 <|> la1
+
+    lift do
+        startWait complex1 >>= (=== 5)
+        startWait complex2 >>= (=== 5)

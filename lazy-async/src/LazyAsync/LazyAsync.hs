@@ -2,7 +2,8 @@
 
 module LazyAsync.LazyAsync where
 
-import Control.Applicative    (Applicative (pure, (<*>)))
+import Control.Applicative    (Alternative (empty, (<|>)),
+                               Applicative (pure, (<*>)))
 import Control.Concurrent.STM (STM)
 import Data.Functor           (Functor (fmap))
 import LazyAsync.Status       (Status)
@@ -15,14 +16,25 @@ data LazyAsync a =
       (STM (Status a)) -- ^ Poll
   | forall x. Ap (LazyAsync (x -> a)) (LazyAsync x)
         -- ^ A complex of two 'LazyAsync's
+  | Choose (LazyAsync a) (LazyAsync a)
+  | Empty
 
 instance Functor LazyAsync where
-    f `fmap` A0 x   = A0 (f x)
-    f `fmap` A1 s a = A1 s (fmap (fmap f) a)
-    f `fmap` Ap x y = Ap (fmap (fmap f) x) y
+    f `fmap` A0 x       = A0 (f x)
+    f `fmap` A1 s a     = A1 s (fmap (fmap f) a)
+    f `fmap` Ap x y     = Ap (fmap (fmap f) x) y
+    f `fmap` Choose x y = Choose (fmap f x) (fmap f y)
+    _ `fmap` Empty      = Empty
 
 -- | '<*>' = 'apply'
-instance Applicative LazyAsync where pure = A0; (<*>) = Ap
+instance Applicative LazyAsync where
+    pure = A0
+    (<*>) = Ap
+
+-- | '<|>' = 'choose'
+instance Alternative LazyAsync where
+    empty = Empty
+    (<|>) = choose
 
 apply :: LazyAsync (a -> b) -- ^ Left part
       -> LazyAsync a        -- ^ Right part
@@ -48,3 +60,6 @@ If multiple parts of a complex fail, the 'LazyAsync.wait' and 'LazyAsync.poll'
 operations only reveal one of the exceptions. Which one? — The leftmost
 exception of the asyncs that have failed so far. Since this may change, which
 exception is visible is not necessarily consistent over time. -}
+
+choose :: LazyAsync a -> LazyAsync a -> LazyAsync a
+choose = Choose

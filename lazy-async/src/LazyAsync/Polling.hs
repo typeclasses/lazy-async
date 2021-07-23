@@ -2,15 +2,14 @@
 
 module LazyAsync.Polling where
 
-import Control.Applicative         (pure, (<*>))
+import Control.Applicative         (empty, liftA2, pure, (<*>), (<|>))
 import Control.Concurrent.STM      (STM, atomically)
 import Control.Monad               (fmap, return, (=<<))
 import Control.Monad.Base          (liftBase)
 import Control.Monad.IO.Class      (MonadIO, liftIO)
 import Control.Monad.Trans.Control (MonadBaseControl, StM, restoreM)
-import Data.Functor.Compose        (Compose (Compose, getCompose))
 import Data.Traversable            (sequenceA)
-import LazyAsync.LazyAsync         (LazyAsync (A0, A1, Ap))
+import LazyAsync.LazyAsync         (LazyAsync (A0, A1, Ap, Choose, Empty))
 import LazyAsync.Status            (Status)
 import System.IO                   (IO)
 
@@ -26,6 +25,8 @@ pollIO la = atomically (pollSTM la)
 
 -- | Akin to 'poll'
 pollSTM :: LazyAsync a -> STM (Status a)
-pollSTM (A0 x)   = return (pure x)
-pollSTM (A1 _ a) = a
-pollSTM (Ap x y) = getCompose (Compose (pollSTM x) <*> Compose (pollSTM y))
+pollSTM (A0 x)       = return (pure x)
+pollSTM (A1 _ a)     = a
+pollSTM (Ap x y)     = liftA2 (<*>) (pollSTM x) (pollSTM y)
+pollSTM (Choose x y) = liftA2 (<|>) (pollSTM x) (pollSTM y)
+pollSTM Empty        = return empty

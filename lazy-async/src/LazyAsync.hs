@@ -24,7 +24,7 @@ module LazyAsync
   ( {- * LazyAsync            -}  LazyAsync,
     {- * Spawning             -}  lazyAsync,
     {- * Getting results      -}  startWait,
-    {- * Combining actions    -}  apply,
+    {- * Combining actions    -}  apply, choose,
     {- * Catching (Outcome)   -}  startWaitCatch, Outcome (..),
                                   applyOutcome, chooseOutcome,
     {- * Polling (Status)     -}  poll, Status (..),
