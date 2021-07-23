@@ -6,6 +6,7 @@ import Control.Applicative    (Alternative (empty, (<|>)),
                                Applicative (pure, (<*>)))
 import Control.Concurrent.STM (STM)
 import Data.Functor           (Functor)
+import LazyAsync.ApplyType    (Apply (..))
 import LazyAsync.Status       (Status)
 
 -- | An asynchronous action that does not start right away
@@ -15,16 +16,12 @@ data LazyAsync a =
   | Ap (Apply LazyAsync a) -- ^ A complex of two 'LazyAsync's
   | Choose (LazyAsync a) (LazyAsync a)
   | Empty
-
-data Apply f a = forall x. Apply (f (x -> a)) (f x)
+  deriving Functor
 
 data StartPoll a = StartPoll
     (STM ()) -- ^ Start
     (STM (Status a)) -- ^ Poll
-
-deriving instance Functor f => Functor (Apply f)
-deriving instance Functor StartPoll
-deriving instance Functor LazyAsync
+  deriving Functor
 
 -- | '<*>' = 'apply'
 instance Applicative LazyAsync where

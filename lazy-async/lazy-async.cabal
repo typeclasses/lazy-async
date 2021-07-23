@@ -33,6 +33,7 @@ library
     hs-source-dirs:     src
     exposed-modules:    LazyAsync
     other-modules:      LazyAsync.Async
+    other-modules:      LazyAsync.ApplyType
     other-modules:      LazyAsync.LazyAsync
     other-modules:      LazyAsync.Memoize
     other-modules:      LazyAsync.Outcome

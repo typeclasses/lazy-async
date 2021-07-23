@@ -7,7 +7,8 @@ import Control.Concurrent.STM (STM, atomically)
 import Control.Monad          (return)
 import Control.Monad.Base     (MonadBase, liftBase)
 import Control.Monad.IO.Class (MonadIO, liftIO)
-import LazyAsync.LazyAsync    (Apply (..), LazyAsync (..), StartPoll (..))
+import LazyAsync.ApplyType    (Apply (..))
+import LazyAsync.LazyAsync    (LazyAsync (..), StartPoll (..))
 import System.IO              (IO)
 
 -- | Starts an asynchronous action, if it has not already been started
