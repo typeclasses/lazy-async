@@ -35,7 +35,7 @@ lazyAsync action = ContT (withLazyAsync action)
 
 -- | Specialization of 'lazyAsync'
 lazyAsyncIO :: IO a -> ContT r IO (LazyAsync a)
-lazyAsyncIO = lazyAsync
+lazyAsyncIO action = ContT (withLazyAsyncIO action)
 
 withLazyAsync :: MonadBaseControl IO m =>
     m a -- ^ Action
@@ -43,6 +43,13 @@ withLazyAsync :: MonadBaseControl IO m =>
     -> m b
 withLazyAsync action continue =
     newTVar False >>= \s -> withAsync (waitForTrue s *> action) (\a -> continue (A1 (writeTVar s True) (pollSTM a <&> maybeEitherStatus)))
+
+-- | Specialization of 'withLazyAsync'
+withLazyAsyncIO ::
+    IO a  -- ^ Action
+    -> (LazyAsync a -> IO b) -- ^ Continuation
+    -> IO b
+withLazyAsyncIO = withLazyAsync
 
 waitForTrue :: (MonadBase base m, MonadIO base) => TVar Bool -> m ()
 waitForTrue x = liftBase (liftIO (atomically (readTVar x >>= check)))
