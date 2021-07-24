@@ -36,8 +36,12 @@ lazyAsync action = ContT (withLazyAsync action)
 
 withLazyAsync :: MonadBaseControl IO m =>
     m a -> (LazyAsync (StM m a) -> m b) -> m b
-withLazyAsync action continue =
-    newTVar False >>= \s -> withAsync (waitForTrue s *> action) (\a -> continue (A1 (StartPoll (writeTVar s True) (pollSTM a <&> maybeEitherStatus))))
+withLazyAsync action continue = withStartPoll action (\sp -> continue (A1 sp))
+
+withStartPoll :: MonadBaseControl IO m =>
+    m a -> (StartPoll (StM m a) -> m b) -> m b
+withStartPoll action continue =
+    newTVar False >>= \s -> withAsync (waitForTrue s *> action) (\a -> continue ((StartPoll (writeTVar s True) (pollSTM a <&> maybeEitherStatus))))
 
 -- | Akin to 'lazyAsync'
 withLazyAsyncIO :: IO a -> (LazyAsync a -> IO b) -> IO b
