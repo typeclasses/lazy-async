@@ -24,7 +24,7 @@ module LazyAsync
   ( {- * LazyAsync            -}  LazyAsync,
     {- * Spawning             -}  lazyAsync,
     {- * Getting results      -}  startWait,
-    {- * Combining actions    -}  apply, choose,
+    {- * Combining actions    -}  apply, choose, merge,
     {- * Catching (Outcome)   -}  startWaitCatch, Outcome (..),
                                   applyOutcome, chooseOutcome,
     {- * Polling (Status)     -}  poll, Status (..),
@@ -45,12 +45,8 @@ module LazyAsync
                                   MonadIO (liftIO)
   ) where
 
-import LazyAsync.Actions.Memoize
-import LazyAsync.Actions.Poll
-import LazyAsync.Actions.Spawn
-import LazyAsync.Actions.Start
-import LazyAsync.Actions.StartWait
-import LazyAsync.Actions.Wait
+import LazyAsync.Actions
+import LazyAsync.Orphans ()
 import LazyAsync.Prelude
 import LazyAsync.Types
 
