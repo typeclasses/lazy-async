@@ -32,28 +32,50 @@ a2 o a b = A2 (Complex o a b)
 
 apply :: LazyAsync (a -> b) -- ^ Left part
       -> LazyAsync a        -- ^ Right part
-      -> LazyAsync b        -- ^ Complex of the left and right parts
+      -> LazyAsync b        -- ^ Conjunction
 apply = a2 (<*>)
 {- ^
-Combines the results of two 'LazyAsync's
+Conjunctively combines the results of two 'LazyAsync's
 
-The behavior of a complex 'LazyAsync':
+The behavior of a conjunctive 'LazyAsync':
 
   * __'LazyAsync.start'__  — Starts all of the parts immediately
 
   * __'LazyAsync.wait'__ — Returns a 'LazyAsync.Success' result after
     all of the parts complete successfully. As soon as one part fails,
-    the whole complex fails immediately (but any 'LazyAsync.Incomplete'
-    parts keep running in the background)
+    the whole conjunction fails immediately (but any
+    'LazyAsync.Incomplete' parts keep running in the background)
 
   * __'LazyAsync.poll'__ — Returns 'LazyAsync.Failure' if any part
     has failed; otherwise 'LazyAsync.Incomplete' if any part has
     not finished; otherwise 'LazyAsync.Success'
 
-If multiple parts of a complex fail, the 'LazyAsync.wait' and 'LazyAsync.poll'
-operations only reveal one of the exceptions. Which one? — The leftmost
-exception of the asyncs that have failed so far. Since this may change, which
-exception is visible is not necessarily consistent over time. -}
+If multiple parts of a conjunction fail, the 'LazyAsync.wait' and
+'LazyAsync.poll' operations only reveal one of the exceptions. Which one? — The
+leftmost exception of the parts that have failed so far. Since this may change,
+which exception is visible is not necessarily consistent over time. -}
 
-choose :: LazyAsync a -> LazyAsync a -> LazyAsync a
+choose :: LazyAsync a -- ^ Left part
+       -> LazyAsync a -- ^ Right part
+       -> LazyAsync a -- ^ Disjunction
 choose = a2 (<|>)
+{- ^
+Disjunctively combines the results of two 'LazyAsync's
+
+The behavior of a disjunctive 'LazyAsync':
+
+  * __'LazyAsync.start'__  — Starts all of the parts immediately
+
+  * __'LazyAsync.wait'__ — Returns a 'LazyAsync.Success' result after
+    any one part completes successfully. As soon as one part succeeds,
+    the whole disjunction succeeds immediately (but any
+    'LazyAsync.Incomplete' parts keep running in the background)
+
+  * __'LazyAsync.poll'__ — Returns 'LazyAsync.Success' if any part
+    has succeeded; otherwise 'LazyAsync.Incomplete' if any part has
+    not finished; otherwise 'LazyAsync.Failure'
+
+If multiple parts of a disjunction succeed, the 'LazyAsync.wait' and
+'LazyAsync.poll' operations only reveal one of the result values. Which one? —
+The leftmost result of the parts that have succeeded so far. Since this may
+change, which value is visible is not necessarily consistent over time. -}
