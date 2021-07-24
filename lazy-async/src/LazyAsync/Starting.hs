@@ -8,7 +8,8 @@ import Control.Monad             (return)
 import Control.Monad.Base        (MonadBase, liftBase)
 import Control.Monad.IO.Class    (MonadIO, liftIO)
 import LazyAsync.Types.Apply     (Apply (..))
-import LazyAsync.Types.LazyAsync (LazyAsync (..), StartPoll (..))
+import LazyAsync.Types.LazyAsync (LazyAsync (..))
+import LazyAsync.Types.StartPoll (StartPoll (..))
 import System.IO                 (IO)
 
 -- | Starts an asynchronous action, if it has not already been started

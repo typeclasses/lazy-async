@@ -2,12 +2,11 @@
 
 module LazyAsync.Types.LazyAsync where
 
-import Control.Applicative    (Alternative (empty, (<|>)),
-                               Applicative (pure, (<*>)))
-import Control.Concurrent.STM (STM)
-import Data.Functor           (Functor)
-import LazyAsync.Types.Apply  (Apply (..))
-import LazyAsync.Types.Status (Status)
+import Control.Applicative       (Alternative (empty, (<|>)),
+                                  Applicative (pure, (<*>)))
+import Data.Functor              (Functor)
+import LazyAsync.Types.Apply     (Apply (..))
+import LazyAsync.Types.StartPoll (StartPoll)
 
 -- | An asynchronous action that does not start right away
 data LazyAsync a =
@@ -16,11 +15,6 @@ data LazyAsync a =
   | Ap (Apply LazyAsync a) -- ^ A complex of two 'LazyAsync's
   | Choose (LazyAsync a) (LazyAsync a)
   | Empty
-  deriving Functor
-
-data StartPoll a = StartPoll
-    (STM ()) -- ^ Start
-    (STM (Status a)) -- ^ Poll
   deriving Functor
 
 -- | '<*>' = 'apply'
