@@ -42,7 +42,7 @@ applyOutcome fo ao =
 chooseOutcome :: Outcome a -> Outcome a -> Outcome a
 chooseOutcome x y =
     case x of
-        Failure _ -> y
+        Failure{} -> y
         _         -> x
 
 data NoAlternative = NoAlternative

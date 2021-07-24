@@ -39,10 +39,18 @@ If any part of a complex is 'Failure', then the complex evaluates to
 
 For example, @'applyStatus' 'Incomplete' ('Failure' e)@ = @'Failure' e@ -}
 applyStatus :: Status (a -> b) -> Status a -> Status b
-Done (Failure e) `applyStatus` _                = Done (Failure e)
-_                `applyStatus` Done (Failure e) = Done (Failure e)
-Done (Success f) `applyStatus` Done (Success x) = Done (Success (f x))
-_                `applyStatus` _                = Incomplete
+applyStatus a b =
+    case a of
+        Done (Success f) ->
+            case b of
+                Done (Success x) -> Done (Success (f x))
+                Done (Failure e) -> Done (Failure e)
+                Incomplete -> Incomplete
+        Done (Failure e) -> Done (Failure e)
+        Incomplete ->
+            case b of
+                Done (Failure e) -> Done (Failure e)
+                _ -> Incomplete
 
 {- | Returns the leftmost 'Success', if there is one
 
