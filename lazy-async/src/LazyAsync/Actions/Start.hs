@@ -7,7 +7,7 @@ import LazyAsync.Types (Complex (..), LazyAsync (..), StartPoll (..))
 import LazyAsync.Prelude (Applicative ((*>)), IO, MonadBase (..), MonadIO (..),
                           STM, atomically, return)
 
--- | Starts an asynchronous action, if it has not already been started
+-- | 🚀 Starts an asynchronous action, if it has not already been started
 start :: (MonadBase base m, MonadIO base) => LazyAsync a -> m ()
 start Pure{}               = return ()
 start Empty{}              = return ()

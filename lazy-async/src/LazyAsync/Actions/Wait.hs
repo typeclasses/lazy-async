@@ -15,11 +15,11 @@ import LazyAsync.Prelude (Functor (fmap), IO, MonadBase (liftBase),
 waitCatchSTM :: LazyAsync a -> STM (Outcome a)
 waitCatchSTM = pollSTM >=> statusOutcomeSTM
 
--- | Waits for the action to complete, and returns its value
+-- | ⏸️ Waits for the action to complete and ✅ returns its value
 --
--- If the action throws an exception, then the exception is returned
+-- 💣 If the action throws an exception, then the exception is returned
 --
--- Does __not__ start the action
+-- 🛑 Does not start the action
 waitCatch :: (MonadBaseControl base m, MonadIO base) => LazyAsync (StM m a) -> m (Outcome a)
 waitCatch x = sequenceA =<< liftBase (fmap (fmap restoreM) (liftIO (waitCatchIO x)))
 
@@ -27,11 +27,11 @@ waitCatch x = sequenceA =<< liftBase (fmap (fmap restoreM) (liftIO (waitCatchIO 
 waitCatchIO :: LazyAsync a -> IO (Outcome a)
 waitCatchIO la = atomically (waitCatchSTM la)
 
--- | Waits for the action to complete, and returns its value
+-- | ⏸️ Waits for the action to complete and ✅ returns its value
 --
--- If the action throws an exception, then the exception is re-thrown
+-- 💣 If the action throws an exception, then the exception is re-thrown
 --
--- Does __not__ start the action
+-- 🛑 Does not start the action
 wait :: (MonadBaseControl base m, MonadIO base) => LazyAsync (StM m a) -> m a
 wait x = liftBase (liftIO (waitCatchIO x) >>= (\o -> liftIO (outcomeSuccess o))) >>= restoreM
 

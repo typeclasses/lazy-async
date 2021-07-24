@@ -10,8 +10,8 @@ import LazyAsync.Prelude (Alternative (..), Applicative (pure, (<*>)),
 --
 -- Obtained using 'LazyAsync.waitCatch'
 data Outcome a =
-    Failure SomeException -- ^ The 'LazyAsync.LazyAsync.LazyAsync' action threw an exception
-  | Success a -- ^ The 'LazyAsync.LazyAsync.LazyAsync' action completed normally
+    Failure SomeException -- ^ 💣 The 'LazyAsync.LazyAsync.LazyAsync' action threw an exception
+  | Success a -- ^ ✅ The 'LazyAsync.LazyAsync.LazyAsync' action completed normally
     deriving (Foldable, Functor, Show, Traversable)
 
 -- | '<*>' = 'applyOutcome'

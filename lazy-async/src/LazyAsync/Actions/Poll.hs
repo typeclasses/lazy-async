@@ -8,9 +8,9 @@ import LazyAsync.Prelude (IO, MonadBaseControl, MonadIO, STM, StM, atomically,
                           empty, fmap, liftA2, liftBase, liftIO, pure, restoreM,
                           return, sequenceA, (=<<))
 
--- | Checks whether an asynchronous action has completed yet
+-- | 🕵️ Checks whether an asynchronous action has completed yet
 --
--- Does __not__ start the action
+-- 🛑 Does not start the action
 poll :: (MonadBaseControl base m, MonadIO base) => LazyAsync (StM m a) -> m (Status a)
 poll la = sequenceA =<< liftBase (fmap (fmap restoreM) (liftIO (pollIO la)))
 

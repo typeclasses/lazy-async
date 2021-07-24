@@ -12,10 +12,12 @@ import LazyAsync.Prelude (Alternative (..), Applicative (pure, (<*>)), Foldable,
 --
 -- Obtained using 'LazyAsync.poll'
 data Status a =
-    Incomplete -- ^ The 'LazyAsync.LazyAsync' action has not finished
-               --   (and might not have even started yet)
-  | Done (Outcome a) -- ^ The 'LazyAsync.LazyAsync' action has ended, either
-                     --   by returning normally or by throwing an exception
+    Incomplete -- ^ ⏳
+        -- The 'LazyAsync.LazyAsync' action has not finished
+        -- (and might not have even started yet)
+  | Done (Outcome a) -- ^ ⌛
+        -- The 'LazyAsync.LazyAsync' action has ended, either
+        -- by ✅ returning normally or by 💣 throwing an exception
     deriving (Foldable, Functor, Show, Traversable)
 
 -- | '<*>' = 'applyStatus'
@@ -31,12 +33,12 @@ instance Alternative Status where
 {- | Combines two 'LazyAsync.LazyAsync' statuses to produce the status of their
 conjunction
 
-  * Returns the leftmost 'Failure', if there is one
+💣 Returns the leftmost 'Failure', if there is one
 
-  * Otherwise, if any part of a conjunction is 'Incomplete', then the
-    whole thing evaluates to 'Incomplete'
+⏳ Otherwise, if any part of a conjunction is 'Incomplete', then the whole thing
+evaluates to 'Incomplete'
 
-  * Only when all parts have completed as 'Success' does the whole succeed
+✅ Only when all parts have completed as 'Success' does the whole succeed
 
 For example, @'applyStatus' 'Incomplete' ('Failure' e)@ = @'Failure' e@ -}
 applyStatus :: Status (a -> b) -> Status a -> Status b
@@ -56,12 +58,12 @@ applyStatus a b =
 {- | Combines two 'LazyAsync.LazyAsync' statuses to produce the status of their
 disjunction
 
-  * Returns the leftmost 'Success', if there is one
+✅ Returns the leftmost 'Success', if there is one
 
-  * Otherwise, if any part of a disjunction is 'Incomplete', then the
-    whole thing evaluates to 'Incomplete'
+⏳ Otherwise, if any part of a disjunction is 'Incomplete', then the whole thing
+evaluates to 'Incomplete'
 
-  * Only when all parts have completed as 'Failure' does the whole fail -}
+💣 Only when all parts have completed as 'Failure' does the whole fail -}
 chooseStatus :: Status a -> Status a -> Status a
 chooseStatus x y =
     case x of
