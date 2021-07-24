@@ -2,9 +2,7 @@
 
 module LazyAsync.Actions.Start where
 
-import LazyAsync.Types.Apply     (Apply (..))
-import LazyAsync.Types.LazyAsync (LazyAsync (..))
-import LazyAsync.Types.StartPoll (StartPoll (..))
+import LazyAsync.Types (Apply (..), LazyAsync (..), StartPoll (..))
 
 import LazyAsync.Prelude (Applicative ((*>)), IO, MonadBase (..), MonadIO (..),
                           STM, atomically, return)

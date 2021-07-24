@@ -50,14 +50,8 @@ import LazyAsync.Actions.Spawn
 import LazyAsync.Actions.Start
 import LazyAsync.Actions.StartWait
 import LazyAsync.Actions.Wait
-import LazyAsync.Types.LazyAsync
-import LazyAsync.Types.Outcome
-import LazyAsync.Types.Status
-
-import Control.Monad.Base
-import Control.Monad.IO.Class
-import Control.Monad.Trans.Cont
-import Control.Monad.Trans.Control
+import LazyAsync.Prelude
+import LazyAsync.Types
 
 {- $monads
 

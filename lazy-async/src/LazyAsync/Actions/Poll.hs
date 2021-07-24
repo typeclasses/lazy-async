@@ -2,10 +2,7 @@
 
 module LazyAsync.Actions.Poll where
 
-import LazyAsync.Types.Apply     (Apply (..))
-import LazyAsync.Types.LazyAsync (LazyAsync (..))
-import LazyAsync.Types.StartPoll (StartPoll (..))
-import LazyAsync.Types.Status    (Status)
+import LazyAsync.Types (Apply (..), LazyAsync (..), StartPoll (..), Status)
 
 import LazyAsync.Prelude (Alternative (empty, (<|>)),
                           Applicative (liftA2, pure, (<*>)), Functor (fmap), IO,

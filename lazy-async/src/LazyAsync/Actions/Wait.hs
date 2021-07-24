@@ -2,10 +2,9 @@
 
 module LazyAsync.Actions.Wait where
 
-import LazyAsync.Actions.Poll    (pollSTM)
-import LazyAsync.Types.LazyAsync (LazyAsync)
-import LazyAsync.Types.Outcome   (Outcome (Failure, Success))
-import LazyAsync.Types.Status    (Status (Done, Incomplete))
+import LazyAsync.Actions.Poll (pollSTM)
+
+import LazyAsync.Types (LazyAsync, Outcome (..), Status (..))
 
 import LazyAsync.Prelude (Functor (fmap), IO, MonadBase (liftBase),
                           MonadBaseControl (..), MonadIO (..), MonadThrow (..),

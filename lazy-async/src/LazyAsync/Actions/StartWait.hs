@@ -2,10 +2,10 @@
 
 module LazyAsync.Actions.StartWait where
 
-import LazyAsync.Actions.Start   (start)
-import LazyAsync.Actions.Wait    (wait, waitCatch)
-import LazyAsync.Types.LazyAsync (LazyAsync)
-import LazyAsync.Types.Outcome   (Outcome)
+import LazyAsync.Actions.Start (start)
+import LazyAsync.Actions.Wait  (wait, waitCatch)
+
+import LazyAsync.Types (LazyAsync, Outcome)
 
 import LazyAsync.Prelude (Applicative ((*>)), IO, MonadBaseControl (StM),
                           MonadIO)

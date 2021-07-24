@@ -2,11 +2,10 @@
 
 module LazyAsync.Actions.Spawn ( lazyAsync, withLazyAsyncIO ) where
 
-import LazyAsync.Async           (pollSTM, withAsync)
-import LazyAsync.Types.LazyAsync (LazyAsync (A1))
-import LazyAsync.Types.Outcome   (Outcome (..))
-import LazyAsync.Types.StartPoll (StartPoll (..))
-import LazyAsync.Types.Status    (Status (..))
+import LazyAsync.Async (pollSTM, withAsync)
+
+import LazyAsync.Types (LazyAsync (A1), Outcome (..), StartPoll (..),
+                        Status (..))
 
 import LazyAsync.Prelude (Applicative ((*>)), Bool (..), ContT (..),
                           Either (..), Functor (fmap), IO, Maybe (..),
