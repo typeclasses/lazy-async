@@ -28,9 +28,9 @@ Conjunctively combines the results of two 'LazyAsync's
     not finished; otherwise 'LazyAsync.Success'
 
 If multiple parts of a conjunction fail, the 'LazyAsync.wait' and
-'LazyAsync.poll' operations only reveal one of the exceptions. Which one? — The
-leftmost exception of the parts that have failed so far. Since this may change,
-which exception is visible is not necessarily consistent over time.
+'LazyAsync.poll' operations only reveal the leftmost exception of the parts that
+have failed so far. Since this may change, which exception is visible is not
+necessarily consistent over time.
 
 'apply' = @'merge' ('<*>')@
 -}
@@ -55,9 +55,9 @@ Disjunctively combines the results of two 'LazyAsync's
     not finished; otherwise 'LazyAsync.Failure'
 
 If multiple parts of a disjunction succeed, the 'LazyAsync.wait' and
-'LazyAsync.poll' operations only reveal one of the result values. Which one? —
-The leftmost result of the parts that have succeeded so far. Since this may
-change, which value is visible is not necessarily consistent over time.
+'LazyAsync.poll' operations only reveal the leftmost result of the parts that
+have succeeded so far. Since this may change, which value is visible is not
+necessarily consistent over time.
 
 'choose' = @'merge' ('<|>')@
 -}
