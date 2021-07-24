@@ -2,13 +2,11 @@
 
 module LazyAsync.Actions.Poll where
 
-import LazyAsync.Types (Apply (..), LazyAsync (..), StartPoll (..), Status)
+import LazyAsync.Types (Complex (..), LazyAsync (..), StartPoll (..), Status)
 
-import LazyAsync.Prelude (Alternative (empty, (<|>)),
-                          Applicative (liftA2, pure, (<*>)), Functor (fmap), IO,
-                          MonadBase (liftBase), MonadBaseControl (..),
-                          MonadIO (..), STM, Traversable (sequenceA),
-                          atomically, return, (=<<))
+import LazyAsync.Prelude (IO, MonadBaseControl, MonadIO, STM, StM, atomically,
+                          empty, fmap, liftA2, liftBase, liftIO, pure, restoreM,
+                          return, sequenceA, (=<<))
 
 -- | Checks whether an asynchronous action has completed yet
 --
@@ -24,6 +22,5 @@ pollIO la = atomically (pollSTM la)
 pollSTM :: LazyAsync a -> STM (Status a)
 pollSTM (Pure x)             = return (pure x)
 pollSTM (A1 (StartPoll _ a)) = a
-pollSTM (Ap (Apply x y))     = liftA2 (<*>) (pollSTM x) (pollSTM y)
-pollSTM (Choose x y)         = liftA2 (<|>) (pollSTM x) (pollSTM y)
+pollSTM (A2 (Complex o x y)) = liftA2 (o) (pollSTM x) (pollSTM y)
 pollSTM Empty                = return empty

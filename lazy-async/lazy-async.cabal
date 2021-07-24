@@ -43,7 +43,7 @@ library
     other-modules:      LazyAsync.Actions.Wait
     other-modules:      LazyAsync.Prelude
     other-modules:      LazyAsync.Types
-    other-modules:      LazyAsync.Types.Apply
+    other-modules:      LazyAsync.Types.Complex
     other-modules:      LazyAsync.Types.LazyAsync
     other-modules:      LazyAsync.Types.Outcome
     other-modules:      LazyAsync.Types.StartPoll

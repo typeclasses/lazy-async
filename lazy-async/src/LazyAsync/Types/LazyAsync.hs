@@ -2,17 +2,18 @@
 
 module LazyAsync.Types.LazyAsync where
 
-import LazyAsync.Types.Apply     (Apply (..))
+import LazyAsync.Types.Complex   (Complex (..))
 import LazyAsync.Types.StartPoll (StartPoll)
+import LazyAsync.Types.Status    (Status)
 
-import LazyAsync.Prelude (Alternative (..), Applicative (pure, (<*>)), Functor)
+import LazyAsync.Prelude (Alternative (empty, (<|>)), Applicative (pure, (<*>)),
+                          Functor)
 
 -- | An asynchronous action that does not start right away
 data LazyAsync a =
     Pure a -- ^ Triviality that gives rise to 'pure'
   | A1 (StartPoll a) -- ^ A single action
-  | Ap (Apply LazyAsync a) -- ^ A complex of two 'LazyAsync's
-  | Choose (LazyAsync a) (LazyAsync a)
+  | A2 (Complex LazyAsync Status a) -- ^ A complex of two 'LazyAsync's
   | Empty
   deriving Functor
 
@@ -29,7 +30,7 @@ instance Alternative LazyAsync where
 apply :: LazyAsync (a -> b) -- ^ Left part
       -> LazyAsync a        -- ^ Right part
       -> LazyAsync b        -- ^ Complex of the left and right parts
-apply f x = Ap (Apply f x)
+apply f x = A2 (Complex (<*>) f x)
 {- ^
 Combines the results of two 'LazyAsync's
 
@@ -52,4 +53,4 @@ exception of the asyncs that have failed so far. Since this may change, which
 exception is visible is not necessarily consistent over time. -}
 
 choose :: LazyAsync a -> LazyAsync a -> LazyAsync a
-choose = Choose
+choose a b = A2 (Complex (<|>) a b)

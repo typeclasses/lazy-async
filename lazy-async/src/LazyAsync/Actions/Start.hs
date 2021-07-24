@@ -2,7 +2,7 @@
 
 module LazyAsync.Actions.Start where
 
-import LazyAsync.Types (Apply (..), LazyAsync (..), StartPoll (..))
+import LazyAsync.Types (Complex (..), LazyAsync (..), StartPoll (..))
 
 import LazyAsync.Prelude (Applicative ((*>)), IO, MonadBase (..), MonadIO (..),
                           STM, atomically, return)
@@ -12,8 +12,7 @@ start :: (MonadBase base m, MonadIO base) => LazyAsync a -> m ()
 start Pure{}               = return ()
 start Empty{}              = return ()
 start (A1 (StartPoll s _)) = liftBase (liftIO (atomically s))
-start (Ap (Apply x y))     = start x *> start y
-start (Choose x y)         = start x *> start y
+start (A2 (Complex _ x y)) = start x *> start y
 
 -- | Akin to 'start'
 startIO :: LazyAsync a -> IO ()
@@ -24,5 +23,4 @@ startSTM :: LazyAsync a -> STM ()
 startSTM Pure{}               = return ()
 startSTM Empty{}              = return ()
 startSTM (A1 (StartPoll s _)) = s
-startSTM (Ap (Apply x y))     = startSTM x *> startSTM y
-startSTM (Choose x y)         = startSTM x *> startSTM y
+startSTM (A2 (Complex _ x y)) = startSTM x *> startSTM y
