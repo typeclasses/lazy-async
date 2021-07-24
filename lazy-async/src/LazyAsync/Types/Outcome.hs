@@ -2,13 +2,9 @@
 
 module LazyAsync.Types.Outcome where
 
-import Control.Applicative (Alternative (empty, (<|>)),
-                            Applicative (pure, (<*>)))
-import Control.Exception   (Exception, SomeException, toException)
-import Data.Foldable       (Foldable)
-import Data.Functor        (Functor)
-import Data.Traversable    (Traversable)
-import Text.Show           (Show)
+import LazyAsync.Prelude (Alternative (..), Applicative (pure, (<*>)),
+                          Exception (..), Foldable, Functor, Show,
+                          SomeException, Traversable)
 
 -- | The result of a 'LazyAsync.LazyAsync' that is 'LazyAsync.Done' running
 --

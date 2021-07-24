@@ -2,15 +2,12 @@
 
 module LazyAsync.Actions.Start where
 
-import Control.Applicative       ((*>))
-import Control.Concurrent.STM    (STM, atomically)
-import Control.Monad             (return)
-import Control.Monad.Base        (MonadBase, liftBase)
-import Control.Monad.IO.Class    (MonadIO, liftIO)
 import LazyAsync.Types.Apply     (Apply (..))
 import LazyAsync.Types.LazyAsync (LazyAsync (..))
 import LazyAsync.Types.StartPoll (StartPoll (..))
-import System.IO                 (IO)
+
+import LazyAsync.Prelude (Applicative ((*>)), IO, MonadBase (..), MonadIO (..),
+                          STM, atomically, return)
 
 -- | Starts an asynchronous action, if it has not already been started
 start :: (MonadBase base m, MonadIO base) => LazyAsync a -> m ()

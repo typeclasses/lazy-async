@@ -2,7 +2,7 @@
 
 module LazyAsync.Types.Apply where
 
-import Data.Functor (Functor)
+import LazyAsync.Prelude (Functor)
 
 data Apply f a = forall x. Apply (f (x -> a)) (f x)
 

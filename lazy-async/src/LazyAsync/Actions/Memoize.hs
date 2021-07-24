@@ -1,11 +1,10 @@
 module LazyAsync.Actions.Memoize where
 
-import Control.Monad               (fmap)
-import Control.Monad.Trans.Cont    (ContT, runContT)
-import Control.Monad.Trans.Control (MonadBaseControl)
 import LazyAsync.Actions.Spawn     (lazyAsync)
 import LazyAsync.Actions.StartWait (startWait)
-import System.IO                   (IO)
+
+import LazyAsync.Prelude (ContT (runContT), Functor (fmap), IO,
+                          MonadBaseControl)
 
 {- | Creates a situation wherein:
 

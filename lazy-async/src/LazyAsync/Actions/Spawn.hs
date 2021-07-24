@@ -2,26 +2,17 @@
 
 module LazyAsync.Actions.Spawn ( lazyAsync, withLazyAsyncIO ) where
 
-import Control.Applicative         ((*>))
-import Control.Concurrent.STM      (atomically, check)
-import Control.Concurrent.STM.TVar (TVar, newTVarIO, readTVar, writeTVar)
-import Control.Exception           (SomeException)
-import Control.Monad               (return, (>>=))
-import Control.Monad.Base          (MonadBase, liftBase)
-import Control.Monad.IO.Class      (MonadIO, liftIO)
-import Control.Monad.Trans.Class   (lift)
-import Control.Monad.Trans.Cont    (ContT (ContT), runContT)
-import Control.Monad.Trans.Control (MonadBaseControl, StM)
-import Data.Bool                   (Bool (..))
-import Data.Either                 (Either (..))
-import Data.Functor                (fmap, (<&>))
-import Data.Maybe                  (Maybe (..))
-import LazyAsync.Async             (pollSTM, withAsync)
-import LazyAsync.Types.LazyAsync   (LazyAsync (A1))
-import LazyAsync.Types.Outcome     (Outcome (..))
-import LazyAsync.Types.StartPoll   (StartPoll (..))
-import LazyAsync.Types.Status      (Status (..))
-import System.IO                   (IO)
+import LazyAsync.Async           (pollSTM, withAsync)
+import LazyAsync.Types.LazyAsync (LazyAsync (A1))
+import LazyAsync.Types.Outcome   (Outcome (..))
+import LazyAsync.Types.StartPoll (StartPoll (..))
+import LazyAsync.Types.Status    (Status (..))
+
+import LazyAsync.Prelude (Applicative ((*>)), Bool (..), ContT (..),
+                          Either (..), Functor (fmap), IO, Maybe (..),
+                          MonadBase (..), MonadBaseControl (StM), MonadIO (..),
+                          SomeException, TVar, atomically, check, lift,
+                          newTVarIO, readTVar, return, writeTVar, (<&>), (>>=))
 
 {- | Creates a situation wherein:
 

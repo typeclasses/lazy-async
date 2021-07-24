@@ -2,18 +2,16 @@
 
 module LazyAsync.Actions.Poll where
 
-import Control.Applicative         (empty, liftA2, pure, (<*>), (<|>))
-import Control.Concurrent.STM      (STM, atomically)
-import Control.Monad               (fmap, return, (=<<))
-import Control.Monad.Base          (liftBase)
-import Control.Monad.IO.Class      (MonadIO, liftIO)
-import Control.Monad.Trans.Control (MonadBaseControl, StM, restoreM)
-import Data.Traversable            (sequenceA)
-import LazyAsync.Types.Apply       (Apply (..))
-import LazyAsync.Types.LazyAsync   (LazyAsync (..))
-import LazyAsync.Types.StartPoll   (StartPoll (..))
-import LazyAsync.Types.Status      (Status)
-import System.IO                   (IO)
+import LazyAsync.Types.Apply     (Apply (..))
+import LazyAsync.Types.LazyAsync (LazyAsync (..))
+import LazyAsync.Types.StartPoll (StartPoll (..))
+import LazyAsync.Types.Status    (Status)
+
+import LazyAsync.Prelude (Alternative (empty, (<|>)),
+                          Applicative (liftA2, pure, (<*>)), Functor (fmap), IO,
+                          MonadBase (liftBase), MonadBaseControl (..),
+                          MonadIO (..), STM, Traversable (sequenceA),
+                          atomically, return, (=<<))
 
 -- | Checks whether an asynchronous action has completed yet
 --

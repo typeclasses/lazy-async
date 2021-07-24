@@ -2,11 +2,10 @@
 
 module LazyAsync.Types.LazyAsync where
 
-import Control.Applicative       (Alternative (empty, (<|>)),
-                                  Applicative (pure, (<*>)))
-import Data.Functor              (Functor)
 import LazyAsync.Types.Apply     (Apply (..))
 import LazyAsync.Types.StartPoll (StartPoll)
+
+import LazyAsync.Prelude (Alternative (..), Applicative (pure, (<*>)), Functor)
 
 -- | An asynchronous action that does not start right away
 data LazyAsync a =

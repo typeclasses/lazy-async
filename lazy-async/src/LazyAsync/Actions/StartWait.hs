@@ -2,14 +2,13 @@
 
 module LazyAsync.Actions.StartWait where
 
-import Control.Applicative         ((*>))
-import Control.Monad.IO.Class      (MonadIO)
-import Control.Monad.Trans.Control (MonadBaseControl, StM)
-import LazyAsync.Actions.Start     (start)
-import LazyAsync.Actions.Wait      (wait, waitCatch)
-import LazyAsync.Types.LazyAsync   (LazyAsync)
-import LazyAsync.Types.Outcome     (Outcome)
-import System.IO                   (IO)
+import LazyAsync.Actions.Start   (start)
+import LazyAsync.Actions.Wait    (wait, waitCatch)
+import LazyAsync.Types.LazyAsync (LazyAsync)
+import LazyAsync.Types.Outcome   (Outcome)
+
+import LazyAsync.Prelude (Applicative ((*>)), IO, MonadBaseControl (StM),
+                          MonadIO)
 
 -- | Starts an asynchronous action, waits for it to complete, and returns its value
 --

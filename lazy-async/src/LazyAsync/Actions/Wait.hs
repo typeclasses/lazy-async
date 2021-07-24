@@ -2,18 +2,15 @@
 
 module LazyAsync.Actions.Wait where
 
-import Control.Concurrent.STM      (STM, atomically, retry)
-import Control.Monad               (fmap, return, (=<<), (>=>), (>>=))
-import Control.Monad.Base          (liftBase)
-import Control.Monad.Catch         (MonadThrow, throwM)
-import Control.Monad.IO.Class      (MonadIO, liftIO)
-import Control.Monad.Trans.Control (MonadBaseControl, StM, restoreM)
-import Data.Traversable            (sequenceA)
-import LazyAsync.Actions.Poll      (pollSTM)
-import LazyAsync.Types.LazyAsync   (LazyAsync)
-import LazyAsync.Types.Outcome     (Outcome (Failure, Success))
-import LazyAsync.Types.Status      (Status (Done, Incomplete))
-import System.IO                   (IO)
+import LazyAsync.Actions.Poll    (pollSTM)
+import LazyAsync.Types.LazyAsync (LazyAsync)
+import LazyAsync.Types.Outcome   (Outcome (Failure, Success))
+import LazyAsync.Types.Status    (Status (Done, Incomplete))
+
+import LazyAsync.Prelude (Functor (fmap), IO, MonadBase (liftBase),
+                          MonadBaseControl (..), MonadIO (..), MonadThrow (..),
+                          STM, Traversable (sequenceA), atomically, retry,
+                          return, (=<<), (>=>), (>>=))
 
 -- | Akin to 'waitCatch'
 waitCatchSTM :: LazyAsync a -> STM (Outcome a)

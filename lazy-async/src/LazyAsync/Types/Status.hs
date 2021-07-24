@@ -2,13 +2,10 @@
 
 module LazyAsync.Types.Status where
 
-import Control.Applicative     (Alternative (empty, (<|>)),
-                                Applicative (pure, (<*>)))
-import Data.Foldable           (Foldable)
-import Data.Functor            (Functor)
-import Data.Traversable        (Traversable)
 import LazyAsync.Types.Outcome (Outcome (Failure, Success))
-import Text.Show               (Show)
+
+import LazyAsync.Prelude (Alternative (..), Applicative (pure, (<*>)), Foldable,
+                          Functor, Show, Traversable)
 
 -- | Whether a 'LazyAsync.LazyAsync' action has
 -- completed yet, and, if so, what it produced
@@ -45,12 +42,12 @@ applyStatus a b =
             case b of
                 Done (Success x) -> Done (Success (f x))
                 Done (Failure e) -> Done (Failure e)
-                Incomplete -> Incomplete
+                Incomplete       -> Incomplete
         Done (Failure e) -> Done (Failure e)
         Incomplete ->
             case b of
                 Done (Failure e) -> Done (Failure e)
-                _ -> Incomplete
+                _                -> Incomplete
 
 {- | Returns the leftmost 'Success', if there is one
 
