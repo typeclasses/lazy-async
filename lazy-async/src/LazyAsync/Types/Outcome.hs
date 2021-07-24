@@ -5,9 +5,9 @@ module LazyAsync.Types.Outcome where
 import Control.Applicative (Alternative (empty, (<|>)),
                             Applicative (pure, (<*>)))
 import Control.Exception   (Exception, SomeException, toException)
-import Data.Foldable       (Foldable (foldr))
-import Data.Functor        (Functor, fmap)
-import Data.Traversable    (Traversable (sequenceA))
+import Data.Foldable       (Foldable)
+import Data.Functor        (Functor)
+import Data.Traversable    (Traversable)
 import Text.Show           (Show)
 
 -- | The result of a 'LazyAsync.LazyAsync' that is 'LazyAsync.Done' running
@@ -16,7 +16,7 @@ import Text.Show           (Show)
 data Outcome a =
     Failure SomeException -- ^ The 'LazyAsync.LazyAsync.LazyAsync' action threw an exception
   | Success a -- ^ The 'LazyAsync.LazyAsync.LazyAsync' action completed normally
-    deriving (Functor, Show)
+    deriving (Foldable, Functor, Show, Traversable)
 
 -- | '<*>' = 'applyOutcome'
 instance Applicative Outcome where
@@ -27,14 +27,6 @@ instance Applicative Outcome where
 instance Alternative Outcome where
     empty = Failure (toException NoAlternative)
     (<|>) = chooseOutcome
-
-instance Foldable Outcome where
-    foldr _ z (Failure _) = z
-    foldr f z (Success x) = f x z
-
-instance Traversable Outcome where
-    sequenceA (Failure e)  = pure (Failure e)
-    sequenceA (Success mx) = fmap Success mx
 
 -- | Behaves the same as '<*>' for 'Data.Either.Either', halting at the leftmost 'Failure'
 applyOutcome :: Outcome (a -> b) -> Outcome a -> Outcome b

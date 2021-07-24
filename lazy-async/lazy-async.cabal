@@ -6,7 +6,9 @@ version: 0
 common language
     default-language:   Haskell2010
     ghc-options:        -Wall
+    default-extensions: DeriveFoldable
     default-extensions: DeriveFunctor
+    default-extensions: DeriveTraversable
     default-extensions: ExistentialQuantification
     default-extensions: FlexibleContexts
     default-extensions: NoImplicitPrelude

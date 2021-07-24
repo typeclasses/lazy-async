@@ -4,9 +4,9 @@ module LazyAsync.Types.Status where
 
 import Control.Applicative     (Alternative (empty, (<|>)),
                                 Applicative (pure, (<*>)))
-import Data.Foldable           (Foldable (foldr))
-import Data.Functor            (Functor, fmap)
-import Data.Traversable        (Traversable (sequenceA))
+import Data.Foldable           (Foldable)
+import Data.Functor            (Functor)
+import Data.Traversable        (Traversable)
 import LazyAsync.Types.Outcome (Outcome (Failure, Success))
 import Text.Show               (Show)
 
@@ -19,7 +19,7 @@ data Status a =
                --   (and might not have even started yet)
   | Done (Outcome a) -- ^ The 'LazyAsync.LazyAsync' action has ended, either
                      --   by returning normally or by throwing an exception
-    deriving (Functor, Show)
+    deriving (Foldable, Functor, Show, Traversable)
 
 -- | '<*>' = 'applyStatus'
 instance Applicative Status where
@@ -30,14 +30,6 @@ instance Applicative Status where
 instance Alternative Status where
     empty = Done empty
     (<|>) = chooseStatus
-
-instance Foldable Status where
-    foldr _ z Incomplete = z
-    foldr f z (Done o)   = foldr f z o
-
-instance Traversable Status where
-    sequenceA Incomplete = pure Incomplete
-    sequenceA (Done o)   = fmap Done (sequenceA o)
 
 {- | Combines two 'LazyAsync.LazyAsync' statuses to produce a summary
 of the status of the overall complex
