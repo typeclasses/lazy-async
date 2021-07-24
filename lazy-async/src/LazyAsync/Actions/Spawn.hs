@@ -6,19 +6,20 @@ import Control.Applicative         ((*>))
 import Control.Concurrent.STM      (atomically, check)
 import Control.Concurrent.STM.TVar (TVar, newTVarIO, readTVar, writeTVar)
 import Control.Exception           (SomeException)
-import Control.Monad               ((>>=))
+import Control.Monad               (return, (>>=))
 import Control.Monad.Base          (MonadBase, liftBase)
 import Control.Monad.IO.Class      (MonadIO, liftIO)
-import Control.Monad.Trans.Cont    (ContT (ContT))
+import Control.Monad.Trans.Class   (lift)
+import Control.Monad.Trans.Cont    (ContT (ContT), runContT)
 import Control.Monad.Trans.Control (MonadBaseControl, StM)
 import Data.Bool                   (Bool (..))
 import Data.Either                 (Either (..))
-import Data.Functor                ((<&>))
+import Data.Functor                (fmap, (<&>))
 import Data.Maybe                  (Maybe (..))
 import LazyAsync.Async             (pollSTM, withAsync)
 import LazyAsync.Types.LazyAsync   (LazyAsync (A1))
-import LazyAsync.Types.StartPoll   (StartPoll (..))
 import LazyAsync.Types.Outcome     (Outcome (..))
+import LazyAsync.Types.StartPoll   (StartPoll (..))
 import LazyAsync.Types.Status      (Status (..))
 import System.IO                   (IO)
 
@@ -32,20 +33,20 @@ import System.IO                   (IO)
 lazyAsync :: MonadBaseControl IO m =>
     m a -- ^ Action
     -> ContT r m (LazyAsync (StM m a))
-lazyAsync action = ContT (withLazyAsync action)
+lazyAsync action = fmap A1 (startPoll action)
 
-withLazyAsync :: MonadBaseControl IO m =>
-    m a -> (LazyAsync (StM m a) -> m b) -> m b
-withLazyAsync action continue = withStartPoll action (\sp -> continue (A1 sp))
-
-withStartPoll :: MonadBaseControl IO m =>
-    m a -> (StartPoll (StM m a) -> m b) -> m b
-withStartPoll action continue =
-    newTVar False >>= \s -> withAsync (waitForTrue s *> action) (\a -> continue ((StartPoll (writeTVar s True) (pollSTM a <&> maybeEitherStatus))))
+startPoll :: MonadBaseControl IO m =>
+    m a -- ^ Action
+    -> ContT b m (StartPoll (StM m a))
+startPoll action =
+  do
+    s <- lift (newTVar False)
+    a <- ContT (withAsync (waitForTrue s *> action))
+    return (StartPoll (writeTVar s True) (pollSTM a <&> maybeEitherStatus))
 
 -- | Akin to 'lazyAsync'
 withLazyAsyncIO :: IO a -> (LazyAsync a -> IO b) -> IO b
-withLazyAsyncIO = withLazyAsync
+withLazyAsyncIO action = runContT (lazyAsync action)
 
 waitForTrue :: (MonadBase base m, MonadIO base) => TVar Bool -> m ()
 waitForTrue x = liftBase (liftIO (atomically (readTVar x >>= check)))
