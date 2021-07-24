@@ -28,11 +28,15 @@ instance Alternative Status where
     empty = Done empty
     (<|>) = chooseStatus
 
-{- | Combines two 'LazyAsync.LazyAsync' statuses to produce a summary
-of the status of the overall complex
+{- | Combines two 'LazyAsync.LazyAsync' statuses to produce the status of their
+conjunction
 
-If any part of a complex is 'Failure', then the complex evaluates to
-'Failure', even if some parts are 'Incomplete'
+  * Returns the leftmost 'Failure', if there is one
+
+  * Otherwise, if any part of a conjunction is 'Incomplete', then the
+    whole thing evaluates to 'Incomplete'
+
+  * Only when all parts have completed as 'Success' does the whole succeed
 
 For example, @'applyStatus' 'Incomplete' ('Failure' e)@ = @'Failure' e@ -}
 applyStatus :: Status (a -> b) -> Status a -> Status b
@@ -49,12 +53,15 @@ applyStatus a b =
                 Done (Failure e) -> Done (Failure e)
                 _                -> Incomplete
 
-{- | Returns the leftmost 'Success', if there is one
+{- | Combines two 'LazyAsync.LazyAsync' statuses to produce the status of their
+disjunction
 
-Otherwise, if any part of a complex is 'Incomplete', then the complex
-evaluates to 'Incomplete'
+  * Returns the leftmost 'Success', if there is one
 
-Only when all parts have completed as 'Failure' does the whole fail -}
+  * Otherwise, if any part of a disjunction is 'Incomplete', then the
+    whole thing evaluates to 'Incomplete'
+
+  * Only when all parts have completed as 'Failure' does the whole fail -}
 chooseStatus :: Status a -> Status a -> Status a
 chooseStatus x y =
     case x of
