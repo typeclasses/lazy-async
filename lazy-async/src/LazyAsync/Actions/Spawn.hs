@@ -1,6 +1,6 @@
 {-# language Safe #-}
 
-module LazyAsync.Spawning ( lazyAsync, withLazyAsyncIO ) where
+module LazyAsync.Actions.Spawn ( lazyAsync, withLazyAsyncIO ) where
 
 import Control.Applicative         ((*>))
 import Control.Concurrent.STM      (atomically, check)

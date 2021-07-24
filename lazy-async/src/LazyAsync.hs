@@ -44,14 +44,15 @@ module LazyAsync
                                   MonadIO (liftIO)
   ) where
 
-import LazyAsync.Memoize
-import LazyAsync.Polling
-import LazyAsync.Spawning
-import LazyAsync.Starting
+import LazyAsync.Actions.Memoize
+import LazyAsync.Actions.Poll
+import LazyAsync.Actions.Spawn
+import LazyAsync.Actions.Start
+import LazyAsync.Actions.StartWait
+import LazyAsync.Actions.Wait
 import LazyAsync.Types.LazyAsync
 import LazyAsync.Types.Outcome
 import LazyAsync.Types.Status
-import LazyAsync.Waiting
 
 import Control.Monad.Base
 import Control.Monad.IO.Class

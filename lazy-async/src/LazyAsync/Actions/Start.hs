@@ -1,6 +1,6 @@
 {-# language Safe #-}
 
-module LazyAsync.Starting where
+module LazyAsync.Actions.Start where
 
 import Control.Applicative       ((*>))
 import Control.Concurrent.STM    (STM, atomically)

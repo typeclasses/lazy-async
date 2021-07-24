@@ -1,6 +1,6 @@
 {-# language Safe #-}
 
-module LazyAsync.Polling where
+module LazyAsync.Actions.Poll where
 
 import Control.Applicative         (empty, liftA2, pure, (<*>), (<|>))
 import Control.Concurrent.STM      (STM, atomically)

@@ -1,8 +1,7 @@
 {-# language Safe #-}
 
-module LazyAsync.Waiting where
+module LazyAsync.Actions.Wait where
 
-import Control.Applicative         ((*>))
 import Control.Concurrent.STM      (STM, atomically, retry)
 import Control.Monad               (fmap, return, (=<<), (>=>), (>>=))
 import Control.Monad.Base          (liftBase)
@@ -10,8 +9,7 @@ import Control.Monad.Catch         (MonadThrow, throwM)
 import Control.Monad.IO.Class      (MonadIO, liftIO)
 import Control.Monad.Trans.Control (MonadBaseControl, StM, restoreM)
 import Data.Traversable            (sequenceA)
-import LazyAsync.Polling           (pollSTM)
-import LazyAsync.Starting          (start)
+import LazyAsync.Actions.Poll      (pollSTM)
 import LazyAsync.Types.LazyAsync   (LazyAsync)
 import LazyAsync.Types.Outcome     (Outcome (Failure, Success))
 import LazyAsync.Types.Status      (Status (Done, Incomplete))
@@ -44,30 +42,6 @@ wait x = liftBase (liftIO (waitCatchIO x) >>= (\o -> liftIO (outcomeSuccess o)))
 -- | Akin to 'wait'
 waitIO :: LazyAsync a -> IO a
 waitIO = wait
-
--- | Starts an asynchronous action, waits for it to complete, and returns its value
---
--- If the action throws an exception, then the exception is re-thrown
---
--- @('startWait' x)@ is equivalent to @('start' x '*>' 'wait' x)@
-startWait :: (MonadBaseControl base m, MonadIO base) => LazyAsync (StM m a) -> m a
-startWait x = start x *> wait x
-
--- | Akin to 'startWait'
-startWaitIO :: LazyAsync a -> IO a
-startWaitIO = startWait
-
--- | Starts an asynchronous action, waits for it to complete, and returns its value
---
--- If the action throws an exception, then the exception is returned
---
--- @('startWaitCatch' x)@ is equivalent to @('start' x '*>' 'waitCatch' x)@
-startWaitCatch :: (MonadBaseControl base m, MonadIO base) => LazyAsync (StM m a) -> m (Outcome a)
-startWaitCatch x = start x *> waitCatch x
-
--- | Akin to 'startWaitCatch'
-startWaitCatchIO :: LazyAsync a -> IO (Outcome a)
-startWaitCatchIO = startWaitCatch
 
 statusOutcomeSTM :: Status a -> STM (Outcome a)
 statusOutcomeSTM Incomplete = retry
