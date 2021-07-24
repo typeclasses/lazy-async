@@ -46,6 +46,7 @@ library
     other-modules:      LazyAsync.Types.Complex
     other-modules:      LazyAsync.Types.LazyAsync
     other-modules:      LazyAsync.Types.Outcome
+    other-modules:      LazyAsync.Types.Resource
     other-modules:      LazyAsync.Types.StartPoll
     other-modules:      LazyAsync.Types.Status
 

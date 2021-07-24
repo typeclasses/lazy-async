@@ -1,17 +1,41 @@
 {-# language Safe #-}
 
-module LazyAsync.Actions.Spawn ( lazyAsync, withLazyAsyncIO ) where
+module LazyAsync.Actions.Spawn
+  ( lazyAsync, withLazyAsyncIO
+  , acquire, acquireIO
+  ) where
 
-import LazyAsync.Async (pollSTM, withAsync)
+import LazyAsync.Async (Async, async, cancel, pollSTM, withAsync)
 
-import LazyAsync.Types (LazyAsync (A1), Outcome (..), StartPoll (..),
-                        Status (..))
+import LazyAsync.Types (LazyAsync (A1), Outcome (..), Resource (..),
+                        StartPoll (..), Status (..))
 
 import LazyAsync.Prelude (Applicative ((*>)), Bool (..), ContT (..),
                           Either (..), Functor (fmap), IO, Maybe (..),
                           MonadBase (..), MonadBaseControl (StM), MonadIO (..),
                           SomeException, TVar, atomically, check, lift,
                           newTVarIO, readTVar, return, writeTVar, (<&>), (>>=))
+
+startPoll :: MonadBaseControl IO m =>
+    m a -- ^ Action
+    -> ContT b m (StartPoll (StM m a))
+startPoll action =
+  do
+    s <- lift (newTVar False)
+    a <- ContT (withAsync (waitForTrue s *> action))
+    return (makeStartPoll s a)
+
+acquireStartPoll :: MonadBaseControl IO m =>
+    m a -- ^ Action
+    -> m (Resource m (StartPoll (StM m a)))
+acquireStartPoll action =
+  do
+    s <- newTVar False
+    a <- async (waitForTrue s *> action)
+    return (Resource{ release = cancel a, resource = makeStartPoll s a})
+
+makeStartPoll :: TVar Bool -> Async a -> StartPoll a
+makeStartPoll s a = StartPoll (writeTVar s True) (pollSTM a <&> maybeEitherStatus)
 
 {- | Creates a situation wherein:
 
@@ -25,14 +49,13 @@ lazyAsync :: MonadBaseControl IO m =>
     -> ContT r m (LazyAsync (StM m a))
 lazyAsync action = fmap A1 (startPoll action)
 
-startPoll :: MonadBaseControl IO m =>
+acquire :: MonadBaseControl IO m =>
     m a -- ^ Action
-    -> ContT b m (StartPoll (StM m a))
-startPoll action =
-  do
-    s <- lift (newTVar False)
-    a <- ContT (withAsync (waitForTrue s *> action))
-    return (StartPoll (writeTVar s True) (pollSTM a <&> maybeEitherStatus))
+    -> m (Resource m (LazyAsync (StM m a)))
+acquire action = fmap (fmap A1) (acquireStartPoll action)
+
+acquireIO :: IO a -> IO (Resource IO (LazyAsync a))
+acquireIO = acquire
 
 -- | Akin to 'lazyAsync'
 withLazyAsyncIO :: IO a -> (LazyAsync a -> IO b) -> IO b
