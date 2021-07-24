@@ -1,14 +1,14 @@
 {-# language Safe #-}
 
-module LazyAsync.Status where
+module LazyAsync.Types.Status where
 
-import Control.Applicative (Alternative (empty, (<|>)),
-                            Applicative (pure, (<*>)))
-import Data.Foldable       (Foldable (foldr))
-import Data.Functor        (Functor, fmap)
-import Data.Traversable    (Traversable (sequenceA))
-import LazyAsync.Outcome   (Outcome (Failure, Success))
-import Text.Show           (Show)
+import Control.Applicative     (Alternative (empty, (<|>)),
+                                Applicative (pure, (<*>)))
+import Data.Foldable           (Foldable (foldr))
+import Data.Functor            (Functor, fmap)
+import Data.Traversable        (Traversable (sequenceA))
+import LazyAsync.Types.Outcome (Outcome (Failure, Success))
+import Text.Show               (Show)
 
 -- | Whether a 'LazyAsync.LazyAsync' action has
 -- completed yet, and, if so, what it produced

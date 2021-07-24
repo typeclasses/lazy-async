@@ -33,14 +33,14 @@ library
     hs-source-dirs:     src
     exposed-modules:    LazyAsync
     other-modules:      LazyAsync.Async
-    other-modules:      LazyAsync.ApplyType
-    other-modules:      LazyAsync.LazyAsync
     other-modules:      LazyAsync.Memoize
-    other-modules:      LazyAsync.Outcome
     other-modules:      LazyAsync.Polling
     other-modules:      LazyAsync.Spawning
     other-modules:      LazyAsync.Starting
-    other-modules:      LazyAsync.Status
+    other-modules:      LazyAsync.Types.Apply
+    other-modules:      LazyAsync.Types.LazyAsync
+    other-modules:      LazyAsync.Types.Outcome
+    other-modules:      LazyAsync.Types.Status
     other-modules:      LazyAsync.Waiting
 
 test-suite test

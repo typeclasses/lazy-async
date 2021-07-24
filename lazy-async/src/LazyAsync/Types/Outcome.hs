@@ -1,6 +1,6 @@
 {-# language Safe #-}
 
-module LazyAsync.Outcome where
+module LazyAsync.Types.Outcome where
 
 import Control.Applicative (Alternative (empty, (<|>)),
                             Applicative (pure, (<*>)))

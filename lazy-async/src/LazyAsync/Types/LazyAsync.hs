@@ -1,13 +1,13 @@
 {-# language Safe #-}
 
-module LazyAsync.LazyAsync where
+module LazyAsync.Types.LazyAsync where
 
 import Control.Applicative    (Alternative (empty, (<|>)),
                                Applicative (pure, (<*>)))
 import Control.Concurrent.STM (STM)
 import Data.Functor           (Functor)
-import LazyAsync.ApplyType    (Apply (..))
-import LazyAsync.Status       (Status)
+import LazyAsync.Types.Apply  (Apply (..))
+import LazyAsync.Types.Status (Status)
 
 -- | An asynchronous action that does not start right away
 data LazyAsync a =

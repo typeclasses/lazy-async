@@ -1,6 +1,6 @@
 {-# language Safe #-}
 
-module LazyAsync.ApplyType where
+module LazyAsync.Types.Apply where
 
 import Data.Functor (Functor)
 

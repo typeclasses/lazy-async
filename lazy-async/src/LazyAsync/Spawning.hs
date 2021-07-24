@@ -16,9 +16,9 @@ import Data.Either                 (Either (..))
 import Data.Functor                ((<&>))
 import Data.Maybe                  (Maybe (..))
 import LazyAsync.Async             (pollSTM, withAsync)
-import LazyAsync.LazyAsync         (LazyAsync (A1), StartPoll (StartPoll))
-import LazyAsync.Outcome           (Outcome (..))
-import LazyAsync.Status            (Status (..))
+import LazyAsync.Types.LazyAsync   (LazyAsync (A1), StartPoll (StartPoll))
+import LazyAsync.Types.Outcome     (Outcome (..))
+import LazyAsync.Types.Status      (Status (..))
 import System.IO                   (IO)
 
 {- | Creates a situation wherein:

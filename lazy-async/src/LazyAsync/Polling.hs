@@ -9,9 +9,9 @@ import Control.Monad.Base          (liftBase)
 import Control.Monad.IO.Class      (MonadIO, liftIO)
 import Control.Monad.Trans.Control (MonadBaseControl, StM, restoreM)
 import Data.Traversable            (sequenceA)
-import LazyAsync.ApplyType         (Apply (..))
-import LazyAsync.LazyAsync         (LazyAsync (..), StartPoll (..))
-import LazyAsync.Status            (Status)
+import LazyAsync.Types.Apply       (Apply (..))
+import LazyAsync.Types.LazyAsync   (LazyAsync (..), StartPoll (..))
+import LazyAsync.Types.Status      (Status)
 import System.IO                   (IO)
 
 -- | Checks whether an asynchronous action has completed yet
