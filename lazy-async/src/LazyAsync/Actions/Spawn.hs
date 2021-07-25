@@ -68,6 +68,7 @@ acquire :: MonadBaseControl IO m =>
     -> m (Resource m (LazyAsync (StM m a)))
 acquire action = fmap (fmap A1) (acquireStartPoll action)
 
+-- | Akin to 'acquire'
 acquireIO :: IO a -> IO (Resource IO (LazyAsync a))
 acquireIO = acquire
 
