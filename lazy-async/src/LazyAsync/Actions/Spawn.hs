@@ -49,6 +49,20 @@ lazyAsync :: MonadBaseControl IO m =>
     -> ContT r m (LazyAsync (StM m a))
 lazyAsync action = fmap A1 (startPoll action)
 
+{- | Like 'lazyAsync', but does not automatically stop the action
+
+The returned 'Resource' includes the desired 'LazyAsync' (the 'resource'), as
+well as a 'release' action that brings it to a halt. If the action is not yet
+started, 'release' prevents it from ever starting. If the action is in progress,
+'release' throws an async exception to stop it. If the action is completed,
+'release' has no effect.
+
+A 'LazyAsync.LazyAsync' represents a background thread which may be utilizing
+time and space. A running thread is not automatically reaped by the garbage
+collector, so one should take care to eventually 'release' every 'LazyAsync'
+resource to avoid accidentally leaving unwanted 'LazyAsync's running.
+
+-}
 acquire :: MonadBaseControl IO m =>
     m a -- ^ Action
     -> m (Resource m (LazyAsync (StM m a)))
