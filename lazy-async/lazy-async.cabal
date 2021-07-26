@@ -21,7 +21,7 @@ common dependencies
     build-depends:      monad-control     ^>= 1.0.2.3
     build-depends:      rank2classes      ^>= 1.4.0.1
     build-depends:      stm               ^>= 2.5
-    build-depends:      transformers      ^>= 0.5.6.2  || ^>= 0.6
+    build-depends:      transformers      ^>= 0.5.6.2
     build-depends:      transformers-base ^>= 0.4.5.1
 
 common test-language
