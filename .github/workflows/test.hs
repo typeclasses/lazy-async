@@ -23,5 +23,6 @@ constraints ghc = catMaybes
     , "optics-core"       .= case ghc of GHC_8_10 -> Just "0.3"      ; GHC_9_0 -> Just "0.4"
     , "optics-th"         .= case ghc of GHC_8_10 -> Just "0.3"      ; GHC_9_0 -> Just "0.4"
     , "rank2classes"      .= case ghc of GHC_8_10 -> Just "1.4.0.1"  ; GHC_9_0 -> Just "1.4.2"
+    , "transformers"      .= case ghc of GHC_8_10 -> Just "0.5.6.2"  ; GHC_9_0 -> Just "0.6.0.2"
     , "transformers-base" .= case ghc of GHC_8_10 -> Just "0.4.5.1"  ; GHC_9_0 -> Just "0.4.5.2"
     ]
