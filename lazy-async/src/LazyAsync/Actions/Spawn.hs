@@ -51,7 +51,7 @@ lazyAsync :: MonadBaseControl IO m =>
     -> ContT r m (LazyAsync (StM m a))
 lazyAsync action = fmap A1 (startPoll action)
 
--- | 🌈 'manyLazyAsyncs' = @'traverse' 'lazyAsync'@
+-- | 🌈 'manyLazyAsyncs' is equivalent to @('traverse' 'lazyAsync')@
 manyLazyAsyncs :: (MonadBaseControl IO m, Traversable t) =>
     t (m a) -> ContT r m (t (LazyAsync (StM m a)))
 manyLazyAsyncs = traverse lazyAsync

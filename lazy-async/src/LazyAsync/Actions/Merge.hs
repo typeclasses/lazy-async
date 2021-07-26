@@ -34,7 +34,7 @@ otherwise 'LazyAsync.Incomplete' if any part has not finished; otherwise
 have failed so far. Since this may change, which exception is visible is not
 necessarily consistent over time.
 
-🌈 'apply' is equivalent to @'merge' ('<*>')@
+🌈 'apply' is equivalent to @('merge' ('<*>'))@
 -}
 
 choose :: LazyAsync a -- ^ Left part
@@ -61,5 +61,5 @@ otherwise 'LazyAsync.Incomplete' if any part has not finished; otherwise
 have succeeded so far. Since this may change, which value is visible is not
 necessarily consistent over time.
 
-🌈 'choose' is equivalent to @'merge' ('<|>')@
+🌈 'choose' is equivalent to @('merge' ('<|>'))@
 -}

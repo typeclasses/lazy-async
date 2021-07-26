@@ -20,12 +20,12 @@ data Status a =
         -- by ✅ returning normally or by 💣 throwing an exception
     deriving (Foldable, Functor, Show, Traversable)
 
--- | '<*>' = 'applyStatus'
+-- | 🌈 '<*>' is equivalent to 'applyStatus'
 instance Applicative Status where
     pure x = Done (pure x)
     (<*>) = applyStatus
 
--- | '<|>' = 'chooseStatus'
+-- | 🌈 '<|>' is equivalent to 'chooseStatus'
 instance Alternative Status where
     empty = Done empty
     (<|>) = chooseStatus

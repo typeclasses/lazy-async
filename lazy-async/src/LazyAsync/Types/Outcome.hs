@@ -14,12 +14,12 @@ data Outcome a =
   | Success a -- ^ ✅ The 'LazyAsync.LazyAsync.LazyAsync' action completed normally
     deriving (Foldable, Functor, Show, Traversable)
 
--- | '<*>' = 'applyOutcome'
+-- | 🌈 '<*>' is equivalent to 'applyOutcome'
 instance Applicative Outcome where
     pure = Success
     (<*>) = applyOutcome
 
--- | '<|>' = 'chooseOutcome'
+-- | 🌈 '<|>' is equivalent to 'chooseOutcome'
 instance Alternative Outcome where
     empty = Failure (toException NoAlternative)
     (<|>) = chooseOutcome

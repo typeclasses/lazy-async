@@ -8,12 +8,12 @@ import LazyAsync.Actions
 import LazyAsync.Prelude
 import LazyAsync.Types
 
--- | '<*>' = 'LazyAsync.apply'
+-- | 🌈 '<*>' is equivalent to 'LazyAsync.apply'
 instance Applicative LazyAsync where
     pure = Pure
     (<*>) = apply
 
--- | '<|>' = 'LazyAsync.choose'
+-- | 🌈 '<|>' is equivalent to 'LazyAsync.choose'
 instance Alternative LazyAsync where
     empty = Empty
     (<|>) = choose
