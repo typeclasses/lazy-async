@@ -1,3 +1,10 @@
+{- |
+
+"Higher-kinded datatypes", for tests
+involving functions like 'memoizeRank2'
+
+-}
+
 module Test.Person where
 
 import Data.String     (String)

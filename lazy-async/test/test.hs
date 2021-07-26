@@ -122,6 +122,7 @@ prop_apply_once = contExample do
 
 prop_choose :: Property
 prop_choose = contExample do
+    annotate "(<|>) can tolerate the failure of either part"
     la1 <- lazyAsync (return (5 :: Integer))
     la2 <- lazyAsync (throw' DivideByZero)
 
@@ -134,6 +135,7 @@ prop_choose = contExample do
 
 prop_rank2 :: Property
 prop_rank2 = contExample do
+    annotate "memoizeRank2 separately memoizes each field of a higher-kinded datatype"
     tick <- expectTicks 2
 
     person <- memoizeRank2
