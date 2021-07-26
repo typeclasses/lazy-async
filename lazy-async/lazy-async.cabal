@@ -25,7 +25,7 @@ common dependencies
     build-depends:      transformers-base ^>= 0.4.5.1
 
 common test-language
-    import: language
+    import:             language
     default-extensions: BlockArguments
     default-extensions: OverloadedStrings
     default-extensions: TemplateHaskell
@@ -42,9 +42,10 @@ common test-modules
     other-modules:      Test.Exceptions
     other-modules:      Test.General
     other-modules:      Test.Optics
+    other-modules:      Test.Person
 
 common test
-    import: test-language, test-dependencies, test-modules
+    import:             test-language, test-dependencies, test-modules
 
 library
     import:             language, dependencies
@@ -75,9 +76,3 @@ test-suite test
     hs-source-dirs:     test
     type:               exitcode-stdio-1.0
     main-is:            test.hs
-
-test-suite rank2
-    import:             test
-    hs-source-dirs:     test
-    type:               exitcode-stdio-1.0
-    main-is:            rank2.hs

@@ -6,8 +6,11 @@ import Test.Counter
 import Test.Exceptions
 import Test.General
 import Test.Optics
+import Test.Person
 
 import Data.Foldable (traverse_)
+import Data.Function (($), (.))
+import Data.Functor  (($>))
 import Prelude       (Integer, (+))
 import System.IO     (IO)
 
@@ -128,3 +131,21 @@ prop_choose = contExample do
     lift do
         startWait complex1 >>= (=== 5)
         startWait complex2 >>= (=== 5)
+
+prop_rank2 :: Property
+prop_rank2 = contExample do
+    tick <- expectTicks 2
+
+    person <- memoizeRank2
+        Person
+            { name = tick $> "Chris"
+            , age  = tick $> 34
+            , location =
+                Location
+                  { city  = tick $> "Ronan"
+                  , state = tick $> "Montana"
+                  }
+            }
+
+    lift $ name person               >>= (=== "Chris")
+    lift $ (state . location) person >>= (=== "Montana")
