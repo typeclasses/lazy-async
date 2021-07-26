@@ -32,12 +32,12 @@ module LazyAsync
     {- * Starting manually    -}  start, wait, waitCatch,
     {- * Manual cancellation  -}  acquire, Resource (..),
     {- * Transactions         -}  pollSTM, startSTM, waitCatchSTM,
-    {- * Memoization          -}  memoize, memoizeRank2,
+    {- * Memoization          -}  memoize, memoizeMany, memoizeRank2,
     {- * Notes on monads      -}  {- $monads -}
     {- * Unlifted variants    -}  {- $unlifted -}
                                   withLazyAsyncIO, startWaitIO, startWaitCatchIO,
                                   pollIO, startIO, waitIO, waitCatchIO,
-                                  acquireIO, withMemoizedIO,
+                                  acquireIO, withMemoizedIO, withMemoizedListIO,
     {- * Re-exports           -}  {- $re-exports -}
                                   ContT (ContT, runContT), evalContT,
                                   MonadBaseControl (liftBaseWith, restoreM, StM),
@@ -71,12 +71,14 @@ many @m@).
 If you are uninterested in monad transformers, you may prefer the
 functions in this section.
 
-  * All of the @m@ type variables are herein specialized to 'System.IO.IO'.
-    This eliminates 'MonadBase', 'MonadBaseControl', 'MonadIO', and 'StM'
-    from the types.
+  * All of the @m@ type variables are herein specialized to 'System.IO.IO',
+    thus eliminating 'MonadBase', 'MonadBaseControl', 'MonadIO', and 'StM'
+    from the types
 
   * Async spawning is done with explicit continuation passing instead of
-    'ContT' actions.
+    'ContT' actions
+
+  * 'Traversable'-constrained type constructors are specialized to @[]@
 
 -}
 

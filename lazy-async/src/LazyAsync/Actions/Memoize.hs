@@ -5,8 +5,8 @@ module LazyAsync.Actions.Memoize where
 import LazyAsync.Actions.Spawn     (lazyAsync)
 import LazyAsync.Actions.StartWait (startWait)
 
-import LazyAsync.Prelude (ContT (runContT), Functor (fmap), IO,
-                          MonadBaseControl)
+import LazyAsync.Prelude (ContT, IO, MonadBaseControl, Traversable, fmap,
+                          runContT, traverse)
 
 import qualified LazyAsync.Libraries.Rank2 as Rank2
 
@@ -25,7 +25,12 @@ memoize action = fmap startWait (lazyAsync action)
 withMemoizedIO :: IO a -> (IO a -> IO b) -> IO b
 withMemoizedIO action = runContT (memoize action)
 
-memoizeRank2 :: (MonadBaseControl IO m, Rank2.Traversable g) =>
-    g m
-    -> ContT r m (g m)
+memoizeMany :: (MonadBaseControl IO m, Traversable t) => t (m a) -> ContT r m (t (m a))
+memoizeMany = traverse memoize
+
+memoizeRank2 :: (MonadBaseControl IO m, Rank2.Traversable t) => t m -> ContT r m (t m)
 memoizeRank2 = Rank2.traverse memoize
+
+-- | Akin to 'memoizeMany'
+withMemoizedListIO :: [IO a] -> ([IO a] -> IO b) -> IO b
+withMemoizedListIO x = runContT (memoizeMany x)

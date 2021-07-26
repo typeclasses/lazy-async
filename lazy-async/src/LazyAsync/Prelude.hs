@@ -8,7 +8,7 @@ import Data.Either       as X (Either (..))
 import Data.Foldable     as X (Foldable)
 import Data.Functor      as X (Functor, fmap, (<&>))
 import Data.Maybe        as X (Maybe (..))
-import Data.Traversable  as X (Traversable, sequenceA)
+import Data.Traversable  as X (Traversable, sequenceA, traverse)
 import System.IO         as X (IO)
 import Text.Show         as X (Show)
 
