@@ -2,8 +2,7 @@
 
 module LazyAsync.Actions.Merge where
 
-import LazyAsync.Types (Complex (Complex), LazyAsync (A2), Status, applyStatus,
-                        chooseStatus)
+import LazyAsync.Types (Complex (..), LazyAsync (..), Outcome (..), Status (..))
 
 merge :: ( Status    a -> Status    b -> Status    c )
              -- ^ Status merge function
@@ -68,3 +67,66 @@ over time
 
 🌈 'choose' is equivalent to @('merge' 'chooseStatus')@
 -}
+
+{- | Combines two 'LazyAsync.LazyAsync' statuses to produce the status of their
+conjunction
+
+💣 Returns the leftmost 'Failure', if there is one
+
+⏳ Otherwise, if any part of a conjunction is 'Incomplete', then the whole thing
+evaluates to 'Incomplete'
+
+✅ Only when all parts have completed as 'Success' does the whole succeed
+
+For example, @'applyStatus' 'Incomplete' ('Failure' e)@ = @'Failure' e@ -}
+applyStatus :: Status (a -> b) -> Status a -> Status b
+applyStatus a b =
+    case a of
+        Done (Success f) ->
+            case b of
+                Done (Success x) -> Done (Success (f x))
+                Done (Failure e) -> Done (Failure e)
+                Incomplete       -> Incomplete
+        Done (Failure e) -> Done (Failure e)
+        Incomplete ->
+            case b of
+                Done (Failure e) -> Done (Failure e)
+                _                -> Incomplete
+
+{- | Combines two 'LazyAsync.LazyAsync' statuses to produce the status of their
+disjunction
+
+✅ Returns the leftmost 'Success', if there is one
+
+⏳ Otherwise, if any part of a disjunction is 'Incomplete', then the whole thing
+evaluates to 'Incomplete'
+
+💣 Only when all parts have completed as 'Failure' does the whole fail -}
+chooseStatus :: Status a -> Status a -> Status a
+chooseStatus x y =
+    case x of
+        Done Success{} -> x
+        Done Failure{} -> y
+        Incomplete ->
+            case y of
+                Done Failure{} -> x
+                _              -> y
+
+-- | Behaves the same as 'Control.Applicative.<*>' for
+-- 'Data.Either.Either', halting at the leftmost 'Failure'
+applyOutcome :: Outcome (a -> b) -> Outcome a -> Outcome b
+applyOutcome fo ao =
+    case fo of
+        Failure e -> Failure e
+        Success f ->
+            case ao of
+                Failure e -> Failure e
+                Success x -> Success (f x)
+
+-- | Behaves the same as 'Control.Applicative.<|>' for
+-- 'Data.Either.Either', returning the leftmost 'Success'
+chooseOutcome :: Outcome a -> Outcome a -> Outcome a
+chooseOutcome x y =
+    case x of
+        Failure{} -> y
+        _         -> x

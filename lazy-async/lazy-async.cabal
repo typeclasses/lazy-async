@@ -52,9 +52,11 @@ library
     hs-source-dirs:     src
     exposed-modules:    LazyAsync
     other-modules:      LazyAsync.Actions
+    other-modules:      LazyAsync.Actions.Empty
     other-modules:      LazyAsync.Actions.Memoize
     other-modules:      LazyAsync.Actions.Merge
     other-modules:      LazyAsync.Actions.Poll
+    other-modules:      LazyAsync.Actions.Pure
     other-modules:      LazyAsync.Actions.Spawn
     other-modules:      LazyAsync.Actions.Start
     other-modules:      LazyAsync.Actions.StartWait
@@ -66,6 +68,7 @@ library
     other-modules:      LazyAsync.Types
     other-modules:      LazyAsync.Types.Complex
     other-modules:      LazyAsync.Types.LazyAsync
+    other-modules:      LazyAsync.Types.NoAlternative
     other-modules:      LazyAsync.Types.Outcome
     other-modules:      LazyAsync.Types.Resource
     other-modules:      LazyAsync.Types.StartPoll
