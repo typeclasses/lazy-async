@@ -12,7 +12,7 @@ running in the background.
 
 __How to use it__ — You can incite a 'LazyAsync' to begin by using 🚀 'start',
 and then you can use ⏸️ 'wait' to block until it completes. There is also
-'startWait', which does both.
+🚀⏸️ 'startWait', which does both.
 
 If the only thing you ever do with your 'LazyAsync's is 'startWait' on them,
 then you may consider using 'memoize' instead, which does not require
