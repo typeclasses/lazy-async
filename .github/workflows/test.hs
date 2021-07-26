@@ -22,6 +22,6 @@ constraints ghc = catMaybes
     , "monad-control"     .= case ghc of GHC_8_10 -> Just "1.0.2.3"  ; GHC_9_0 -> Nothing
     , "optics-core"       .= case ghc of GHC_8_10 -> Just "0.3"      ; GHC_9_0 -> Just "0.4"
     , "optics-th"         .= case ghc of GHC_8_10 -> Just "0.3"      ; GHC_9_0 -> Just "0.4"
-    , "rank2classes"      .= case ghc of GHC_8_10 -> Just "1.4"      ; GHC_9_0 -> Just "1.4.2"
+    , "rank2classes"      .= case ghc of GHC_8_10 -> Just "1.4.0.1"  ; GHC_9_0 -> Just "1.4.2"
     , "transformers-base" .= case ghc of GHC_8_10 -> Just "0.4.5.1"  ; GHC_9_0 -> Just "0.4.5.2"
     ]
