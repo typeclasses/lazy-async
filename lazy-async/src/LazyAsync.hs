@@ -32,12 +32,14 @@ module LazyAsync
     {- * Starting manually    -}  start, wait, waitCatch,
     {- * Manual cancellation  -}  acquire, Resource (..),
     {- * Transactions         -}  pollSTM, startSTM, waitCatchSTM,
-    {- * Memoization          -}  memoize, memoizeMany, memoizeRank2,
+    {- * Memoization          -}  memoize,
+    {- * Bulk operations      -}  manyLazyAsyncs, memoizeMany, memoizeRank2,
     {- * Notes on monads      -}  {- $monads -}
     {- * Unlifted variants    -}  {- $unlifted -}
                                   withLazyAsyncIO, startWaitIO, startWaitCatchIO,
                                   pollIO, startIO, waitIO, waitCatchIO,
-                                  acquireIO, withMemoizedIO, withMemoizedListIO,
+                                  acquireIO, withLazyAsyncListIO,
+                                  withMemoizedIO, withMemoizedListIO,
     {- * Re-exports           -}  {- $re-exports -}
                                   ContT (ContT, runContT), evalContT,
                                   MonadBaseControl (liftBaseWith, restoreM, StM),

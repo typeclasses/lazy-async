@@ -25,9 +25,11 @@ memoize action = fmap startWait (lazyAsync action)
 withMemoizedIO :: IO a -> (IO a -> IO b) -> IO b
 withMemoizedIO action = runContT (memoize action)
 
+-- | 🌈 'memoizeMany' = @'traverse' 'memoize'@
 memoizeMany :: (MonadBaseControl IO m, Traversable t) => t (m a) -> ContT r m (t (m a))
 memoizeMany = traverse memoize
 
+-- | 🌈 'memoizeRank2' = @'Rank2.traverse' 'memoize'@
 memoizeRank2 :: (MonadBaseControl IO m, Rank2.Traversable t) => t m -> ContT r m (t m)
 memoizeRank2 = Rank2.traverse memoize
 

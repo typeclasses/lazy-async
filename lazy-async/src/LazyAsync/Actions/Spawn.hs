@@ -2,6 +2,7 @@
 
 module LazyAsync.Actions.Spawn
   ( lazyAsync, withLazyAsyncIO
+  , manyLazyAsyncs, withLazyAsyncListIO
   , acquire, acquireIO
   ) where
 
@@ -13,8 +14,9 @@ import LazyAsync.Types (LazyAsync (A1), Outcome (..), Resource (..),
 import LazyAsync.Prelude (Applicative ((*>)), Bool (..), ContT (..),
                           Either (..), Functor (fmap), IO, Maybe (..),
                           MonadBase (..), MonadBaseControl (StM), MonadIO (..),
-                          SomeException, TVar, atomically, check, lift,
-                          newTVarIO, readTVar, return, writeTVar, (<&>), (>>=))
+                          SomeException, TVar, Traversable, atomically, check,
+                          lift, newTVarIO, readTVar, return, traverse,
+                          writeTVar, (<&>), (>>=))
 
 startPoll :: MonadBaseControl IO m =>
     m a -- ^ Action
@@ -48,6 +50,15 @@ lazyAsync :: MonadBaseControl IO m =>
     m a -- ^ Action
     -> ContT r m (LazyAsync (StM m a))
 lazyAsync action = fmap A1 (startPoll action)
+
+-- | 🌈 'manyLazyAsyncs' = @'traverse' 'lazyAsync'@
+manyLazyAsyncs :: (MonadBaseControl IO m, Traversable t) =>
+    t (m a) -> ContT r m (t (LazyAsync (StM m a)))
+manyLazyAsyncs = traverse lazyAsync
+
+-- | Akin to 'manyLazyAsyncs'
+withLazyAsyncListIO :: [IO a] -> ([LazyAsync a] -> IO b) -> IO b
+withLazyAsyncListIO actions = runContT (manyLazyAsyncs actions)
 
 {- | Like 'lazyAsync', but does not automatically stop the action
 
