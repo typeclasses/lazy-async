@@ -73,9 +73,9 @@ many @m@).
 If you are uninterested in monad transformers, you may prefer the
 functions in this section.
 
-  * All of the @m@ type variables are herein specialized to 'System.IO.IO',
-    thus eliminating 'MonadBase', 'MonadBaseControl', 'MonadIO', and 'StM'
-    from the types
+  * All of the @m@ type variables are specialized to 'System.IO.IO',
+    thus eliminating 'MonadBase', 'MonadBaseControl', 'MonadIO', and
+    'StM' from the types
 
   * Async spawning is done with explicit continuation passing instead of
     'ContT' actions
