@@ -4,43 +4,23 @@ import LazyAsync
 
 import Test.Counter
 import Test.Exceptions
+import Test.General
 import Test.Optics
 
-import Control.Concurrent (threadDelay)
-import Data.Bool          (not)
-import Data.Foldable      (traverse_)
-import Data.Function      ((.))
-import Prelude            ((+), Integer)
-import System.Exit        (exitFailure)
-import System.IO          (IO)
+import Data.Foldable (traverse_)
+import Prelude       (Integer, (+))
+import System.IO     (IO)
 
 import Control.Exception (ArithException (DivideByZero))
 
 import Control.Applicative       (liftA2, (<|>))
-import Control.Monad             ((>>=), replicateM_, when, return)
+import Control.Monad             (replicateM_, return, (>>=))
 import Control.Monad.Trans.Class (MonadTrans (lift))
 
-import Hedgehog (Group, Property, PropertyT, annotate, checkParallel, discover,
-                 property, withTests, (===))
-
+import Hedgehog (Property, annotate, discover, (===))
 
 main :: IO ()
-main = checkParallel group >>= \ok -> when (not ok) exitFailure
-
-group :: Group
-group = $$(discover)
-
-example :: PropertyT IO () -> Property
-example = withTests 1 . property
-
-contExample :: ContT () (PropertyT IO) () -> Property
-contExample = example . evalContT
-
-contIO :: MonadIO m => ContT a IO a -> ContT () m a
-contIO = liftIO . evalContT
-
-pause :: MonadBase IO m => m ()
-pause = liftBase (threadDelay 1000000)
+main = main' $$(discover)
 
 prop_noAutoStart :: Property
 prop_noAutoStart = contExample do

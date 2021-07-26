@@ -23,12 +23,28 @@ common dependencies
     build-depends:      transformers
     build-depends:      transformers-base ^>= 0.4.5.1
 
+common test-language
+    import: language
+    default-extensions: BlockArguments
+    default-extensions: OverloadedStrings
+    default-extensions: TemplateHaskell
+
 common test-dependencies
     import:             dependencies
     build-depends:      hedgehog          ^>= 1.0.4
     build-depends:      lazy-async
     build-depends:      optics-core       ^>= 0.3    || ^>= 0.4
     build-depends:      optics-th         ^>= 0.3    || ^>= 0.4
+    build-depends:      rank2classes
+
+common test-modules
+    other-modules:      Test.Counter
+    other-modules:      Test.Exceptions
+    other-modules:      Test.General
+    other-modules:      Test.Optics
+
+common test
+    import: test-language, test-dependencies, test-modules
 
 library
     import:             language, dependencies
@@ -54,13 +70,13 @@ library
     other-modules:      LazyAsync.Types.Status
 
 test-suite test
-    import:             language, test-dependencies
+    import:             test
     hs-source-dirs:     test
     type:               exitcode-stdio-1.0
     main-is:            test.hs
-    default-extensions: BlockArguments
-    default-extensions: OverloadedStrings
-    default-extensions: TemplateHaskell
-    other-modules:      Test.Counter
-    other-modules:      Test.Exceptions
-    other-modules:      Test.Optics
+
+test-suite rank2
+    import:             test
+    hs-source-dirs:     test
+    type:               exitcode-stdio-1.0
+    main-is:            rank2.hs
