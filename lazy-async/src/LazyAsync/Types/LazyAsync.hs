@@ -10,8 +10,8 @@ import LazyAsync.Prelude (Functor)
 
 -- | An asynchronous action that does not start right away
 data LazyAsync a =
-    Empty -- ^ Triviality that gives rise to 'empty'
-  | Pure a -- ^ Triviality that gives rise to 'pure'
+    Empty -- ^ Triviality that gives rise to 'Control.Applicative.empty'
+  | Pure a -- ^ Triviality that gives rise to 'Control.Applicative.pure'
   | A1 (StartPoll a) -- ^ A single action
   | A2 (Complex LazyAsync Status a) -- ^ A complex of two 'LazyAsync's
   deriving Functor
