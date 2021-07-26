@@ -15,7 +15,6 @@ import System.IO                 (IO)
 
 import Hedgehog (Property, discover, (===))
 
-import qualified Rank2
 import qualified Rank2.TH as Rank2
 
 data Person f =
@@ -41,7 +40,7 @@ prop_rank2 :: Property
 prop_rank2 = contExample do
     tick <- expectTicks 2
 
-    person <- Rank2.traverse memoize
+    person <- memoizeRank2
         Person
             { name = tick $> "Chris"
             , age  = tick $> 34

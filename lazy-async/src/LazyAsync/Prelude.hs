@@ -1,3 +1,5 @@
+{-# language Safe #-}
+
 module LazyAsync.Prelude (module X) where
 
 import Control.Exception as X (Exception, SomeException, toException)

@@ -5,7 +5,7 @@ module LazyAsync.Actions.Spawn
   , acquire, acquireIO
   ) where
 
-import LazyAsync.Async (Async, async, cancel, pollSTM, withAsync)
+import LazyAsync.Libraries.Async (Async, async, cancel, pollSTM, withAsync)
 
 import LazyAsync.Types (LazyAsync (A1), Outcome (..), Resource (..),
                         StartPoll (..), Status (..))

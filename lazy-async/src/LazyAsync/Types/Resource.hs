@@ -1,3 +1,5 @@
+{-# language Safe #-}
+
 module LazyAsync.Types.Resource where
 
 import LazyAsync.Prelude (Functor)

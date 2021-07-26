@@ -1,3 +1,5 @@
+{-# language Safe #-}
+
 module LazyAsync.Actions.Merge where
 
 import LazyAsync.Types (Complex (Complex), LazyAsync (A2), Status)

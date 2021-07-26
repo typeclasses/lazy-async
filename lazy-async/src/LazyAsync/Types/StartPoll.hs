@@ -1,3 +1,5 @@
+{-# language Safe #-}
+
 module LazyAsync.Types.StartPoll where
 
 import LazyAsync.Types.Status (Status)

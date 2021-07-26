@@ -1,3 +1,5 @@
+{-# language Safe #-}
+
 {-# options_ghc -Wno-orphans #-}
 
 module LazyAsync.Orphans where

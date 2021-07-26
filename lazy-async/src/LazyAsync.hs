@@ -32,7 +32,7 @@ module LazyAsync
     {- * Starting manually    -}  start, wait, waitCatch,
     {- * Manual cancellation  -}  acquire, Resource (..),
     {- * Transactions         -}  pollSTM, startSTM, waitCatchSTM,
-    {- * Memoization          -}  memoize,
+    {- * Memoization          -}  memoize, memoizeRank2,
     {- * Notes on monads      -}  {- $monads -}
     {- * Unlifted variants    -}  {- $unlifted -}
                                   withLazyAsyncIO, startWaitIO, startWaitCatchIO,

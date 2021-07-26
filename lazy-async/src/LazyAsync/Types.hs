@@ -1,3 +1,5 @@
+{-# language Safe #-}
+
 module LazyAsync.Types (module X) where
 
 import LazyAsync.Types.Complex   as X

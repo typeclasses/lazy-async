@@ -1,3 +1,5 @@
+{-# language Safe #-}
+
 module LazyAsync.Actions (module X) where
 
 import LazyAsync.Actions.Memoize   as X
