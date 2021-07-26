@@ -31,8 +31,8 @@ data Location f =
     , state :: f String
     }
 
-$(Rank2.deriveAll ''Person)
 $(Rank2.deriveAll ''Location)
+$(Rank2.deriveAll ''Person)
 
 main :: IO ()
 main = main' $$(discover)
