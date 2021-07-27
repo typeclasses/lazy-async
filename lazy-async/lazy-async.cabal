@@ -18,7 +18,7 @@ description:
     situations like these, we use "LazyAsync".
 
     Under the hood, an 'IO' action is turned into a @LazyAsync@ by
-    constructing of two things: An @Async@ (from the @async@ package),
+    constructing two things: An @Async@ (from the @async@ package),
     and a @TVar Bool@ (from the @stm@ package). The TVar, initialized
     to @False@, indicates whether the action is wanted yet. The async
     thread waits until the TVar turns @True@ and then runs the action.
