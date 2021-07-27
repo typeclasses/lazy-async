@@ -1,7 +1,7 @@
 cabal-version: 3.0
 
 name: lazy-async
-version: 0
+version: 1.0.0.0
 synopsis: Asynchronous actions that don't start right away
 
 description:
