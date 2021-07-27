@@ -33,7 +33,8 @@ module LazyAsync
     {- * Manual cancellation  -}  acquire, Resource (..),
     {- * Transactions         -}  pollSTM, startSTM, waitCatchSTM,
     {- * Memoization          -}  memoize,
-    {- * Bulk operations      -}  manyLazyAsyncs, memoizeMany, memoizeRank2,
+    {- * Bulk operations      -}  {- $bulk -}
+                                  manyLazyAsyncs, memoizeMany, memoizeRank2,
     {- * Notes on monads      -}  {- $monads -}
     {- * Unlifted variants    -}  {- $unlifted -}
                                   withLazyAsyncIO, startWaitIO, startWaitCatchIO,
@@ -51,6 +52,19 @@ import LazyAsync.Actions
 import LazyAsync.Orphans ()
 import LazyAsync.Prelude
 import LazyAsync.Types
+
+{- $bulk
+
+If you have a list (or other 'Traversable') of actions, the "many" functions
+('manyLazyAsyncs' and 'memoizeMany') can create a thread for each action in the
+list.
+
+If you have a big recordful of actions and feel like getting real fancy, try
+making your datatype "higher-kinded" and using 'memoizeRank2' to automatically
+create a bunch of threads at once. You'll need the @rank2classes@ package; see
+"Rank2" and "Rank2.TH".
+
+-}
 
 {- $monads
 
