@@ -53,7 +53,7 @@ prop_startWait = contExample do
     annotate "'startWait' prompts a 'LazyAsync' to run"
     tick <- expectTicks 1
     la <- lazyAsync tick
-    lift( startWait la >>= (=== 1))
+    lift (startWait la >>= (=== 1))
 
 prop_start_idempotent :: Property
 prop_start_idempotent = contExample do
