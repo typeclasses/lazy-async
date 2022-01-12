@@ -1,0 +1,13 @@
+packages: lazy-async
+
+constraints:
+    base ^>= 4.14
+  , exceptions == 0.10.4
+  , hedgehog == 1.0.4
+  , lifted-async == 0.10.0.6
+  , monad-control == 1.0.2.3
+  , optics-core == 0.3
+  , optics-th == 0.3
+  , rank2classes == 1.4.0.1
+  , transformers == 0.5.6.2
+  , transformers-base == 0.4.5.1
