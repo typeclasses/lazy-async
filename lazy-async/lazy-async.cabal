@@ -1,7 +1,7 @@
 cabal-version: 3.0
 
 name: lazy-async
-version: 1.0.0.0
+version: 1.0.0.1
 synopsis: Asynchronous actions that don't start right away
 
 description:
@@ -33,6 +33,8 @@ license-file:   license.txt
 category:       Concurrency
 build-type:     Simple
 
+extra-source-files: changelog.txt
+
 source-repository head
   type: git
   location: https://github.com/typeclasses/lazy-async
@@ -50,6 +52,7 @@ common language
 
 common dependencies
     build-depends:      base              ^>= 4.14     || ^>= 4.15
+                                                       || ^>= 4.16
     build-depends:      exceptions        ^>= 0.10.4
     build-depends:      lifted-async      ^>= 0.10.0.6
     build-depends:      monad-control     ^>= 1.0.2.3
