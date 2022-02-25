@@ -1,7 +1,7 @@
 packages: lazy-async
 
 constraints:
-    base ^>= 4.15
+    base == 4.15.*
   , hedgehog == 1.0.5
   , lifted-async == 0.10.2
   , optics-core == 0.4

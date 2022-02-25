@@ -69,7 +69,7 @@ common test-language
 
 common test-dependencies
     import:             dependencies
-    build-depends:      hedgehog          ^>= 1.0.4
+    build-depends:      hedgehog          ^>= 1.0.4    || ^>= 1.1
     build-depends:      lazy-async
     build-depends:      optics-core       ^>= 0.3      || ^>= 0.4
     build-depends:      optics-th         ^>= 0.3      || ^>= 0.4

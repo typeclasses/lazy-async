@@ -1,7 +1,7 @@
 packages: lazy-async
 
 constraints:
-    base ^>= 4.14
+    base == 4.14.*
   , exceptions == 0.10.4
   , hedgehog == 1.0.4
   , lifted-async == 0.10.0.6
