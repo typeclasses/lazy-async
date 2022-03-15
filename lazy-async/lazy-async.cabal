@@ -34,8 +34,8 @@ category:       Concurrency
 build-type:     Simple
 
 source-repository head
-  type: git
-  location: https://github.com/typeclasses/lazy-async
+    type: git
+    location: https://github.com/typeclasses/lazy-async
 
 common language
     default-language:   Haskell2010
