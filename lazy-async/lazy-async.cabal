@@ -33,8 +33,6 @@ license-file:   license.txt
 category:       Concurrency
 build-type:     Simple
 
-extra-source-files: changelog.txt
-
 source-repository head
   type: git
   location: https://github.com/typeclasses/lazy-async
