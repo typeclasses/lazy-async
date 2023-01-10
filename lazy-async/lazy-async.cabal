@@ -31,7 +31,6 @@ copyright:      2021 Mission Valley Software LLC
 license:        MIT
 license-file:   license.txt
 category:       Concurrency
-build-type:     Simple
 
 source-repository head
     type: git
