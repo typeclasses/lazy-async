@@ -54,12 +54,12 @@ common dependencies
     build-depends:
       , base ^>= 4.14 || ^>= 4.15 || ^>= 4.16
       , exceptions ^>= 0.10.4
-      , lifted-async ^>= 0.10.0.6
-      , monad-control ^>= 1.0.2.3
-      , rank2classes ^>= 1.4.0.1
+      , lifted-async ^>= 0.10.0
+      , monad-control ^>= 1.0.2
+      , rank2classes ^>= 1.4.0
       , stm ^>= 2.5
-      , transformers ^>= 0.5.6.2
-      , transformers-base ^>= 0.4.5.1
+      , transformers ^>= 0.5.6
+      , transformers-base ^>= 0.4.5
 
 library
     import: language, dependencies
