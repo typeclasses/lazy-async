@@ -42,7 +42,7 @@ common language
 
 common dependencies
     build-depends:
-      , base ^>= 4.14 || ^>= 4.15 || ^>= 4.16
+      , base ^>= 4.14 || ^>= 4.15 || ^>= 4.16 || ^>= 4.17
       , exceptions ^>= 0.10.4
       , lifted-async ^>= 0.10.2
       , monad-control ^>= 1.0.3
@@ -90,7 +90,7 @@ test-suite test
         OverloadedStrings
         TemplateHaskell
     build-depends:
-      , hedgehog ^>= 1.0.5 || ^>= 1.1
+      , hedgehog ^>= 1.0.5 || ^>= 1.1 || ^>= 1.2
       , lazy-async
       , optics-core ^>= 0.4.1
       , optics-th ^>= 0.4.1
