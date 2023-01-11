@@ -13,10 +13,6 @@ sourceOverrides = haskell.lib.packageSourceOverrides {
     lazy-async = ./lazy-async;
 };
 
-depOverrides = new: old: {
-    # package-name = new.callPackage ./nix/package-name-0.0.0.0.nix {};
-};
-
 ghc."8.10" = nixos-22-05.haskell.packages.ghc8107.override (old: {
     overrides = combineOverrides old [
         sourceOverrides
