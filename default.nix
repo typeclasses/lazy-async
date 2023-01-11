@@ -35,7 +35,7 @@ ghc."9.4" = nixos-22-11.haskell.packages.ghc94.override (old: {
     overrides = combineOverrides old [
         sourceOverrides
         (new: old: {
-            data-functor-logistic = new.callPackage ./nix/data-functor-logistic.nix {};
+            data-functor-logistic = new.callPackage ./nix/data-functor-logistic-0.0.nix {};
             rank2classes = new.callPackage ./nix/rank2classes-1.4.6.nix {};
         })
     ];
