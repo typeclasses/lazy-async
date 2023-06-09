@@ -10,7 +10,7 @@ once. In situations like these, we use `LazyAsync`.
 Under the hood, an `IO` action is turned into a `LazyAsync` by constructing two
 things: An `Async` (from the [async] package), and a `TVar Bool` (from the [stm]
 package). The `TVar`, initialized to `False`, indicates whether the action is
-wanted yet. The asynchronous thread waits until the `TVar` turns @True@ and then
+wanted yet. The asynchronous thread waits until the `TVar` turns `True` and then
 runs the action.
 
   [async]: https://hackage.haskell.org/package/async
