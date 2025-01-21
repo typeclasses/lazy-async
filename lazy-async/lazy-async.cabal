@@ -1,7 +1,7 @@
 cabal-version: 3.0
 
 name: lazy-async
-version: 1.0.0.2
+version: 1.0.0.3
 synopsis: Asynchronous actions that don't start right away
 category: Concurrency
 
@@ -42,13 +42,13 @@ common language
 
 common dependencies
     build-depends:
-      , base ^>= 4.15 || ^>= 4.16 || ^>= 4.17
+      , base ^>= 4.18 || ^>= 4.19
       , exceptions ^>= 0.10.4
       , lifted-async ^>= 0.10.2
       , monad-control ^>= 1.0.3
-      , rank2classes ^>= 1.4.4
+      , rank2classes ^>= 1.5
       , stm ^>= 2.5
-      , transformers ^>= 0.5.6
+      , transformers ^>= 0.6
       , transformers-base ^>= 0.4.6
 
 library
@@ -90,7 +90,7 @@ test-suite test
         OverloadedStrings
         TemplateHaskell
     build-depends:
-      , hedgehog ^>= 1.0.5 || ^>= 1.1 || ^>= 1.2
+      , hedgehog ^>= 1.3 || ^>= 1.4 || ^>= 1.5
       , lazy-async
       , optics-core ^>= 0.4.1
       , optics-th ^>= 0.4.1
